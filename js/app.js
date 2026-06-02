@@ -405,9 +405,9 @@ function renderForm(stateCode) {
             Generate
           </button>
         </div>
-        <div class="id-box-value" id="dln-display">
-          <span class="id-box-placeholder">Click Generate</span>
-        </div>
+        <input type="text" class="id-box-value" id="dln-display"
+               placeholder="Click Generate or type manually"
+               oninput="onIdBoxEdit('dln',this.value)" />
         <div class="id-box-format">Format: ${describeDLFormat(state.dlFormat)}</div>
       </div>
       <div class="id-box">
@@ -418,9 +418,9 @@ function renderForm(stateCode) {
             Generate
           </button>
         </div>
-        <div class="id-box-value" id="icn-display">
-          <span class="id-box-placeholder">Click Generate</span>
-        </div>
+        <input type="text" class="id-box-value" id="icn-display"
+               placeholder="Click Generate or type manually"
+               oninput="onIdBoxEdit('icn',this.value)" />
         <div class="id-box-format">10-digit control number</div>
       </div>
       <div class="id-box">
@@ -431,9 +431,9 @@ function renderForm(stateCode) {
             Generate
           </button>
         </div>
-        <div class="id-box-value" id="dd-display">
-          <span class="id-box-placeholder">Click Generate</span>
-        </div>
+        <input type="text" class="id-box-value" id="dd-display"
+               placeholder="Click Generate or type manually"
+               oninput="onIdBoxEdit('dd',this.value)" />
         <div class="id-box-format">Unique document identifier</div>
       </div>
       <div class="id-box">
@@ -444,9 +444,9 @@ function renderForm(stateCode) {
             Generate
           </button>
         </div>
-        <div class="id-box-value" id="issue-display">
-          <span class="id-box-placeholder">Click Generate</span>
-        </div>
+        <input type="text" class="id-box-value" id="issue-display"
+               placeholder="MM/DD/YYYY or Generate"
+               oninput="onIdBoxEdit('issue',this.value)" />
         <div class="id-box-format">Default: today (${todayStr})</div>
       </div>
       <div class="id-box id-box-full">
@@ -457,9 +457,9 @@ function renderForm(stateCode) {
             Generate
           </button>
         </div>
-        <div class="id-box-value" id="expiry-display">
-          <span class="id-box-placeholder">Click Generate</span>
-        </div>
+        <input type="text" class="id-box-value" id="expiry-display"
+               placeholder="MM/DD/YYYY or Generate"
+               oninput="onIdBoxEdit('expiry',this.value)" />
         <div class="id-box-format">Default: +${expiryYrs} years (${expiryStr})</div>
       </div>
     </div>`;
@@ -562,7 +562,7 @@ function autoGenDLN() {
 
   const display = document.getElementById('dln-display');
   if (display) {
-    display.innerHTML = `<span class="id-box-generated">${generatedDLN}</span>`;
+    display.value = generatedDLN;
     display.classList.add('flash');
     setTimeout(() => display.classList.remove('flash'), 300);
   }
@@ -581,7 +581,7 @@ function autoGenINC() {
 
   const display = document.getElementById('icn-display');
   if (display) {
-    display.innerHTML = `<span class="id-box-generated">${generatedICN}</span>`;
+    display.value = generatedICN;
     display.classList.add('flash');
     setTimeout(() => display.classList.remove('flash'), 300);
   }
@@ -609,7 +609,7 @@ function autoGenDD() {
 
   const display = document.getElementById('dd-display');
   if (display) {
-    display.innerHTML = `<span class="id-box-generated">${generatedDD}</span>`;
+    display.value = generatedDD;
     display.classList.add('flash');
     setTimeout(() => display.classList.remove('flash'), 300);
   }
@@ -632,7 +632,7 @@ function autoGenIssue() {
 
   const display = document.getElementById('issue-display');
   if (display) {
-    display.innerHTML = `<span class="id-box-generated">${generatedIssue}</span>`;
+    display.value = generatedIssue;
     display.classList.add('flash');
     setTimeout(() => display.classList.remove('flash'), 300);
   }
@@ -655,7 +655,7 @@ function autoGenExpiry() {
 
   const display = document.getElementById('expiry-display');
   if (display) {
-    display.innerHTML = `<span class="id-box-generated">${generatedExpiry}</span>`;
+    display.value = generatedExpiry;
     display.classList.add('flash');
     setTimeout(() => display.classList.remove('flash'), 300);
   }
