@@ -37,57 +37,57 @@ const FAKE_CITIES = {
 
 // ─── State Data with DL formats (mirrors TG.py StateProfile) ────
 const STATES = [
-  { code:"AL", name:"Alabama", dlFormat:"digits:7", rev:"2022" },
-  { code:"AK", name:"Alaska", dlFormat:"digits:7", rev:"2018" },
-  { code:"AZ", name:"Arizona", dlFormat:"L+digits:8", rev:"2023" },
-  { code:"AR", name:"Arkansas", dlFormat:"digits:9", rev:"2016" },
-  { code:"CA", name:"California", dlFormat:"L+digits:7", rev:"2024", tag:"new" },
-  { code:"CO", name:"Colorado", dlFormat:"digits:9", rev:"2022" },
-  { code:"CT", name:"Connecticut", dlFormat:"digits:9", rev:"2017" },
-  { code:"DE", name:"Delaware", dlFormat:"digits:7", rev:"2018" },
-  { code:"DC", name:"D.C.", dlFormat:"digits:7", rev:"2017" },
-  { code:"FL", name:"Florida", dlFormat:"L+digits:12", rev:"2017" },
-  { code:"GA", name:"Georgia", dlFormat:"digits:9", rev:"2019" },
-  { code:"HI", name:"Hawaii", dlFormat:"L+digits:8", rev:"2013" },
-  { code:"ID", name:"Idaho", dlFormat:"LL+digits:6", rev:"2023" },
-  { code:"IL", name:"Illinois", dlFormat:"L+digits:11", rev:"2016" },
-  { code:"IN", name:"Indiana", dlFormat:"indiana_hyphen", rev:"2017" },
-  { code:"IA", name:"Iowa", dlFormat:"digits:9", rev:"2017" },
-  { code:"KS", name:"Kansas", dlFormat:"ks_hyphen", rev:"2012" },
-  { code:"KY", name:"Kentucky", dlFormat:"L+digits:8", rev:"2018" },
-  { code:"LA", name:"Louisiana", dlFormat:"digits:9", rev:"2016" },
-  { code:"ME", name:"Maine", dlFormat:"digits:7", rev:"2016" },
-  { code:"MD", name:"Maryland", dlFormat:"md_hyphen", rev:"2021" },
-  { code:"MA", name:"Massachusetts", dlFormat:"S+digits:8", rev:"2018" },
-  { code:"MI", name:"Michigan", dlFormat:"mi_spaced", rev:"2024" },
-  { code:"MN", name:"Minnesota", dlFormat:"L+digits:12", rev:"2017" },
-  { code:"MS", name:"Mississippi", dlFormat:"digits:9", rev:"2023" },
-  { code:"MO", name:"Missouri", dlFormat:"L+digits:9", rev:"2020" },
-  { code:"MT", name:"Montana", dlFormat:"digits:9", rev:"2016" },
-  { code:"NE", name:"Nebraska", dlFormat:"L+digits:8", rev:"2021" },
-  { code:"NV", name:"Nevada", dlFormat:"digits:10", rev:"2021" },
-  { code:"NH", name:"New Hampshire", dlFormat:"NHL+digits:8", rev:"2024" },
-  { code:"NJ", name:"New Jersey", dlFormat:"L+digits:14", rev:"2020" },
-  { code:"NM", name:"New Mexico", dlFormat:"digits:9", rev:"2016" },
-  { code:"NY", name:"New York", dlFormat:"digits:9", rev:"2022" },
-  { code:"NC", name:"N. Carolina", dlFormat:"digits:12", rev:"2017" },
-  { code:"ND", name:"N. Dakota", dlFormat:"3d+2L+4d", rev:"2023" },
-  { code:"OH", name:"Ohio", dlFormat:"LL+digits:6", rev:"2018" },
-  { code:"OK", name:"Oklahoma", dlFormat:"L+digits:9", rev:"2017" },
-  { code:"OR", name:"Oregon", dlFormat:"digits:7", rev:"2018" },
-  { code:"PA", name:"Pennsylvania", dlFormat:"digits:8", rev:"2022" },
-  { code:"RI", name:"Rhode Island", dlFormat:"digits:7", rev:"2022" },
-  { code:"SC", name:"S. Carolina", dlFormat:"digits:9", rev:"2018" },
-  { code:"SD", name:"S. Dakota", dlFormat:"digits:9", rev:"2016" },
-  { code:"TN", name:"Tennessee", dlFormat:"digits:9", rev:"2018" },
-  { code:"TX", name:"Texas", dlFormat:"digits:8", rev:"2020" },
-  { code:"UT", name:"Utah", dlFormat:"digits:9", rev:"2018" },
-  { code:"VT", name:"Vermont", dlFormat:"digits:8", rev:"2017" },
-  { code:"VA", name:"Virginia", dlFormat:"L+digits:8", rev:"2018" },
-  { code:"WA", name:"Washington", dlFormat:"wa_wdl", rev:"2021", tag:"new" },
-  { code:"WV", name:"W. Virginia", dlFormat:"L+digits:6", rev:"2016" },
-  { code:"WI", name:"Wisconsin", dlFormat:"L+digits:13", rev:"2017" },
-  { code:"WY", name:"Wyoming", dlFormat:"wy_hyphen", rev:"2017" },
+  { code:"AL", name:"Alabama", dlFormat:"digits:7", rev:"2022", expiryYears:4 },
+  { code:"AK", name:"Alaska", dlFormat:"digits:7", rev:"2018", expiryYears:8 },
+  { code:"AZ", name:"Arizona", dlFormat:"L+digits:8", rev:"2023", expiryYears:12 },
+  { code:"AR", name:"Arkansas", dlFormat:"9+digits:8", rev:"2016", expiryYears:8 },
+  { code:"CA", name:"California", dlFormat:"L+digits:7", rev:"2024", tag:"new", expiryYears:5 },
+  { code:"CO", name:"Colorado", dlFormat:"digits:9", rev:"2022", expiryYears:5 },
+  { code:"CT", name:"Connecticut", dlFormat:"digits:9", rev:"2017", expiryYears:6 },
+  { code:"DE", name:"Delaware", dlFormat:"digits:7", rev:"2018", expiryYears:8 },
+  { code:"DC", name:"D.C.", dlFormat:"digits:7", rev:"2017", expiryYears:8 },
+  { code:"FL", name:"Florida", dlFormat:"L+digits:12", rev:"2017", expiryYears:8 },
+  { code:"GA", name:"Georgia", dlFormat:"digits:9", rev:"2019", expiryYears:8 },
+  { code:"HI", name:"Hawaii", dlFormat:"L+digits:8", rev:"2013", expiryYears:8 },
+  { code:"ID", name:"Idaho", dlFormat:"LL+digits:6", rev:"2023", expiryYears:8 },
+  { code:"IL", name:"Illinois", dlFormat:"L+digits:11", rev:"2016", expiryYears:4 },
+  { code:"IN", name:"Indiana", dlFormat:"indiana_hyphen", rev:"2017", expiryYears:6 },
+  { code:"IA", name:"Iowa", dlFormat:"3d+2L+4d", rev:"2017", expiryYears:8 },
+  { code:"KS", name:"Kansas", dlFormat:"ks_hyphen", rev:"2012", expiryYears:6 },
+  { code:"KY", name:"Kentucky", dlFormat:"L+digits:8", rev:"2018", expiryYears:4 },
+  { code:"LA", name:"Louisiana", dlFormat:"digits:9", rev:"2016", expiryYears:6 },
+  { code:"ME", name:"Maine", dlFormat:"digits:7", rev:"2016", expiryYears:6 },
+  { code:"MD", name:"Maryland", dlFormat:"md_hyphen", rev:"2021", expiryYears:8 },
+  { code:"MA", name:"Massachusetts", dlFormat:"S+digits:8", rev:"2018", expiryYears:5 },
+  { code:"MI", name:"Michigan", dlFormat:"mi_spaced", rev:"2024", expiryYears:4 },
+  { code:"MN", name:"Minnesota", dlFormat:"L+digits:12", rev:"2017", expiryYears:4 },
+  { code:"MS", name:"Mississippi", dlFormat:"digits:9", rev:"2023", expiryYears:8 },
+  { code:"MO", name:"Missouri", dlFormat:"L+digits:9", rev:"2020", expiryYears:6 },
+  { code:"MT", name:"Montana", dlFormat:"digits:9", rev:"2016", expiryYears:8 },
+  { code:"NE", name:"Nebraska", dlFormat:"L+digits:8", rev:"2021", expiryYears:5 },
+  { code:"NV", name:"Nevada", dlFormat:"digits:10", rev:"2021", expiryYears:8 },
+  { code:"NH", name:"New Hampshire", dlFormat:"NHL+digits:8", rev:"2024", expiryYears:5 },
+  { code:"NJ", name:"New Jersey", dlFormat:"L+digits:14", rev:"2020", expiryYears:4 },
+  { code:"NM", name:"New Mexico", dlFormat:"digits:9", rev:"2016", expiryYears:8 },
+  { code:"NY", name:"New York", dlFormat:"digits:9", rev:"2022", expiryYears:8 },
+  { code:"NC", name:"N. Carolina", dlFormat:"digits:12", rev:"2017", expiryYears:8 },
+  { code:"ND", name:"N. Dakota", dlFormat:"LLL+digits:6", rev:"2023", expiryYears:6 },
+  { code:"OH", name:"Ohio", dlFormat:"LL+digits:6", rev:"2018", expiryYears:4 },
+  { code:"OK", name:"Oklahoma", dlFormat:"L+digits:9", rev:"2017", expiryYears:4 },
+  { code:"OR", name:"Oregon", dlFormat:"digits:7", rev:"2018", expiryYears:8 },
+  { code:"PA", name:"Pennsylvania", dlFormat:"digits:8", rev:"2022", expiryYears:4 },
+  { code:"RI", name:"Rhode Island", dlFormat:"digits:7", rev:"2022", expiryYears:5 },
+  { code:"SC", name:"S. Carolina", dlFormat:"digits:9", rev:"2018", expiryYears:8 },
+  { code:"SD", name:"S. Dakota", dlFormat:"digits:8", rev:"2016", expiryYears:5 },
+  { code:"TN", name:"Tennessee", dlFormat:"digits:9", rev:"2018", expiryYears:5 },
+  { code:"TX", name:"Texas", dlFormat:"digits:8", rev:"2020", expiryYears:6 },
+  { code:"UT", name:"Utah", dlFormat:"digits:9", rev:"2018", expiryYears:8 },
+  { code:"VT", name:"Vermont", dlFormat:"digits:8", rev:"2017", expiryYears:8 },
+  { code:"VA", name:"Virginia", dlFormat:"L+digits:8", rev:"2018", expiryYears:8 },
+  { code:"WA", name:"Washington", dlFormat:"wa_wdl", rev:"2021", tag:"new", expiryYears:6 },
+  { code:"WV", name:"W. Virginia", dlFormat:"L+digits:6", rev:"2016", expiryYears:5 },
+  { code:"WI", name:"Wisconsin", dlFormat:"L+digits:13", rev:"2017", expiryYears:8 },
+  { code:"WY", name:"Wyoming", dlFormat:"wy_hyphen", rev:"2017", expiryYears:4 },
 ];
 
 // ─── Per-state form fields ──────────────────────────────────────
@@ -117,16 +117,59 @@ const FIELD_DEFS = {
 const DEFAULT_MANDATORY = ["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"];
 const DEFAULT_OPTIONAL  = ["DAD","DAW","DAZ","DCB","DCD"];
 
+// Per-state field configs — ALL 51 states from TG.py STATE_FIELD_REQS
 const STATE_FIELDS = {
   TX: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCL","DDK","DCB","DCD"] },
   FL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  AR: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
+  CO: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCL","DCU","DCB","DCD"] },
+  IA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  IN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
+  PA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  NV: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAZ","DCE","DCU","DCB","DCD"] },
+  DC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
+  SC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DCL","DDK","DCB","DCD"] },
+  WA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DDK","DCB","DCD"] },
   CA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
   IL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
-  IN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
-  NV: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAZ","DCE","DCU","DCB","DCD"] },
   OH: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCE","DCU","DDK","DCB","DCD"] },
+  NC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCL","DDK","DCB","DCD"] },
+  NE: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAZ","DCE","DCL","DCB","DCD"] },
+  MO: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DCU","DDK","DCB","DCD"] },
+  MA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
+  NH: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
+  WY: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
+  MI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
+  MD: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  AK: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  GA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
+  MS: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
+  NJ: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  UT: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  VA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  KS: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
+  MN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  WI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  TN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
+  OR: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  OK: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  WV: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAZ","DCB","DCD"] },
+  AZ: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
+  RI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  SD: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  VT: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
   NY: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  PA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  AL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  CT: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  DE: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  HI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  ID: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  KY: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  LA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  ME: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  MT: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  NM: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
+  ND: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
 };
 
 // ─── DL Number Generator (mirrors DocEngine.gen_dl) ─────────────
@@ -152,6 +195,7 @@ function generateDLN(state, lastName) {
   if (fmt === 'LL+digits:6') return randLetters(2) + randDigits(6);
   if (fmt === 'S+digits:8') return 'S' + randDigits(8);
   if (fmt === 'NHL+digits:8') return 'NHL' + randDigits(8);
+  if (fmt === 'LLL+digits:6') return randLetters(3) + randDigits(6);
   if (fmt === '3d+2L+4d') return randDigits(3) + randLetters(2) + randDigits(4);
   if (fmt === 'indiana_hyphen') return `${randDigits(4)}-${randDigits(2)}-${randDigits(4)}`;
   if (fmt === 'ks_hyphen') return `K${randDigits(2)}-${randDigits(2)}-${randDigits(4)}`;
@@ -347,7 +391,8 @@ function renderForm(stateCode) {
   // ── ID Display Boxes (DLN, INC, DD, Issue, Expiry) ──
   const today = new Date();
   const todayStr = `${padDate(today.getMonth()+1)}/${padDate(today.getDate())}/${today.getFullYear()}`;
-  const expiryDt = new Date(today.getFullYear() + 8, today.getMonth(), today.getDate());
+  const expiryYrs = state.expiryYears || 8;
+  const expiryDt = new Date(today.getFullYear() + expiryYrs, today.getMonth(), today.getDate());
   const expiryStr = `${padDate(expiryDt.getMonth()+1)}/${padDate(expiryDt.getDate())}/${expiryDt.getFullYear()}`;
 
   html += `
@@ -415,7 +460,7 @@ function renderForm(stateCode) {
         <div class="id-box-value" id="expiry-display">
           <span class="id-box-placeholder">Click Generate</span>
         </div>
-        <div class="id-box-format">Default: +8 years (${expiryStr})</div>
+        <div class="id-box-format">Default: +${expiryYrs} years (${expiryStr})</div>
       </div>
     </div>`;
 
@@ -497,7 +542,8 @@ function describeDLFormat(fmt) {
     'L+digits:8': 'Letter + 8 digits', 'L+digits:9': 'Letter + 9 digits',
     'L+digits:11': 'Letter + 11 digits', 'L+digits:12': 'Letter + 12 digits',
     'L+digits:13': 'Letter + 13 digits', 'L+digits:14': 'Letter + 14 digits',
-    'LL+digits:6': '2 Letters + 6 digits', 'S+digits:8': 'S + 8 digits',
+    'LL+digits:6': '2 Letters + 6 digits', 'LLL+digits:6': '3 Letters + 6 digits',
+    'S+digits:8': 'S + 8 digits',
     'NHL+digits:8': 'NHL + 8 digits', '3d+2L+4d': '3dig + 2let + 4dig',
     'indiana_hyphen': 'XXXX-XX-XXXX', 'ks_hyphen': 'KXX-XX-XXXX',
     'md_hyphen': 'X-XXX-XXX-XXX-XXX', 'wy_hyphen': 'XXXXXX-XXX',
@@ -601,9 +647,10 @@ function autoGenIssue() {
 // ─── Auto-Generate Expiry Date ──────────────────────────────────
 function autoGenExpiry() {
   if (!selectedState) return;
-  // Default: issue date + 8 years (most states)
+  // Default: issue date + state-specific expiry years
   const base = generatedIssue ? parseSimpleDate(generatedIssue) : new Date();
-  const expiry = new Date(base.getFullYear() + 8, base.getMonth(), base.getDate());
+  const expiryYrs = selectedState?.expiryYears || 8;
+  const expiry = new Date(base.getFullYear() + expiryYrs, base.getMonth(), base.getDate());
   generatedExpiry = `${padDate(expiry.getMonth()+1)}/${padDate(expiry.getDate())}/${expiry.getFullYear()}`;
 
   const display = document.getElementById('expiry-display');
