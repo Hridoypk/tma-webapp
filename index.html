@@ -2,25 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0d1117">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0e14">
   <meta name="color-scheme" content="dark">
   <title>AAMVA Premium — Barcode Generator</title>
-  <meta name="description" content="Professional AAMVA PDF417 barcode generator with 40+ US state jurisdictions. Generate byte-fidelity barcodes instantly.">
+  <meta name="description" content="Professional AAMVA PDF417 barcode generator with 51 US state jurisdictions.">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
+<!-- Skip link for keyboard/screen reader users -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
 <div id="app">
 
   <!-- ═══ DASHBOARD VIEW ═══════════════════════════════════════ -->
-  <div id="dashboard" class="view active">
+  <main id="dashboard" class="view active" role="main" id="main-content">
 
     <!-- Header -->
     <header class="app-header">
       <div class="app-brand">
-        <div class="app-logo">🪪</div>
+        <div class="app-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="14" y2="12"/><line x1="7" y1="16" x2="11" y2="16"/></svg>
+        </div>
         <div>
           <div class="app-title">AAMVA Premium</div>
         </div>
@@ -31,165 +36,194 @@
     </header>
 
     <!-- Welcome Banner -->
-    <div class="welcome-banner">
-      <div class="welcome-greeting">👋 Welcome, <span id="welcome-name">User</span></div>
+    <div class="welcome-banner" role="banner">
+      <div class="welcome-greeting">Welcome, <span id="welcome-name">User</span></div>
       <div class="welcome-subtitle">Byte-fidelity barcode intelligence engine</div>
     </div>
 
     <!-- Stat Cards -->
-    <div class="stats-grid">
-      <div class="stat-card emerald" onclick="showView('states-view')">
-        <div class="stat-icon">🗺️</div>
+    <div class="stats-grid" role="list" aria-label="Statistics">
+      <div class="stat-card emerald" role="listitem" tabindex="0" onclick="showView('states-view')" aria-label="51 states available">
+        <div class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3 7l6-4 6 4 6-4v14l-6 4-6-4-6 4z"/><line x1="9" y1="3" x2="9" y2="17"/><line x1="15" y1="7" x2="15" y2="21"/></svg>
+        </div>
         <div class="stat-value" id="stat-states">51</div>
         <div class="stat-label">States</div>
-        <div class="stat-meter"><div class="stat-meter-fill" id="meter-states" style="width: 100%"></div></div>
+        <div class="stat-meter"><div class="stat-meter-fill" id="meter-states" style="width:100%"></div></div>
       </div>
-      <div class="stat-card cyan">
-        <div class="stat-icon">📊</div>
-        <div class="stat-value" id="stat-gens">—</div>
+      <div class="stat-card cyan" role="listitem" aria-label="Generations today">
+        <div class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        </div>
+        <div class="stat-value" id="stat-gens">&mdash;</div>
         <div class="stat-label">Today</div>
-        <div class="stat-meter"><div class="stat-meter-fill" id="meter-gens" style="width: 0%"></div></div>
+        <div class="stat-meter"><div class="stat-meter-fill" id="meter-gens" style="width:0%"></div></div>
       </div>
-      <div class="stat-card gold">
-        <div class="stat-icon">💳</div>
-        <div class="stat-value" id="stat-credits">—</div>
+      <div class="stat-card gold" role="listitem" aria-label="Credits remaining">
+        <div class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="stat-value" id="stat-credits">&mdash;</div>
         <div class="stat-label">Credits</div>
-        <div class="stat-meter"><div class="stat-meter-fill" id="meter-credits" style="width: 0%"></div></div>
+        <div class="stat-meter"><div class="stat-meter-fill" id="meter-credits" style="width:0%"></div></div>
       </div>
-      <div class="stat-card purple">
-        <div class="stat-icon">🏅</div>
-        <div class="stat-value" id="stat-tier">—</div>
+      <div class="stat-card purple" role="listitem" aria-label="Account tier">
+        <div class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+        </div>
+        <div class="stat-value" id="stat-tier">&mdash;</div>
         <div class="stat-label">Tier</div>
-        <div class="stat-meter"><div class="stat-meter-fill" id="meter-tier" style="width: 0%"></div></div>
+        <div class="stat-meter"><div class="stat-meter-fill" id="meter-tier" style="width:0%"></div></div>
       </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="section-header">
-      <div class="section-title">⚡ Quick Actions</div>
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Quick Actions
+      </div>
     </div>
-    <div class="quick-actions">
-      <div class="action-btn" onclick="showView('states-view')">
-        <span class="action-icon">🪪</span>
+    <nav class="quick-actions" aria-label="Quick actions">
+      <button class="action-btn" onclick="showView('states-view')" aria-label="Generate barcode">
+        <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="14" y2="12"/></svg></span>
         <span class="action-label">Generate</span>
-      </div>
-      <div class="action-btn" onclick="showView('states-view')">
-        <span class="action-icon">🗺️</span>
+      </button>
+      <button class="action-btn" onclick="showView('states-view')" aria-label="Browse states">
+        <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7l6-4 6 4 6-4v14l-6 4-6-4-6 4z"/></svg></span>
         <span class="action-label">States</span>
-      </div>
-      <div class="action-btn" onclick="showToast('Open /buy in the bot chat', 'info')">
-        <span class="action-icon">💰</span>
+      </button>
+      <button class="action-btn" onclick="showToast('Open /buy in bot chat', 'info')" aria-label="Buy credits">
+        <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
         <span class="action-label">Buy</span>
-      </div>
-      <div class="action-btn" onclick="showToast('Open /templates in the bot chat', 'info')">
-        <span class="action-icon">📋</span>
+      </button>
+      <button class="action-btn" onclick="showToast('Open /templates in bot chat', 'info')" aria-label="View templates">
+        <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
         <span class="action-label">Templates</span>
-      </div>
-      <div class="action-btn" onclick="showToast('Open /history in the bot chat', 'info')">
-        <span class="action-icon">📜</span>
+      </button>
+      <button class="action-btn" onclick="showToast('Open /history in bot chat', 'info')" aria-label="View history">
+        <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
         <span class="action-label">History</span>
-      </div>
-      <div class="action-btn" onclick="showToast('Open /help in the bot chat', 'info')">
-        <span class="action-icon">📚</span>
+      </button>
+      <button class="action-btn" onclick="showToast('Open /help in bot chat', 'info')" aria-label="Help guide">
+        <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
         <span class="action-label">Help</span>
-      </div>
-    </div>
+      </button>
+    </nav>
 
     <!-- Features -->
     <div class="section-header">
-      <div class="section-title">✨ Features</div>
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Features
+      </div>
     </div>
-    <div class="auto-ids-card" style="margin-bottom: var(--space-lg);">
-      <div class="auto-id-row">
-        <span class="auto-id-label">🔬 XML.txt-verified field orders</span>
-        <span class="auto-id-value" style="color: var(--accent-emerald);">✓</span>
+    <div class="features-card" role="list" aria-label="Feature list">
+      <div class="feature-row" role="listitem">
+        <span class="feature-label"><svg viewBox="0 0 24 24" stroke="var(--brand-secondary)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg> XML.txt-verified field orders</span>
+        <span class="feature-check" aria-label="Available"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
       </div>
-      <div class="auto-id-row">
-        <span class="auto-id-label">📊 Per-state revision handling</span>
-        <span class="auto-id-value" style="color: var(--accent-emerald);">✓</span>
+      <div class="feature-row" role="listitem">
+        <span class="feature-label"><svg viewBox="0 0 24 24" stroke="var(--brand-secondary)"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Per-state revision handling</span>
+        <span class="feature-check" aria-label="Available"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
       </div>
-      <div class="auto-id-row">
-        <span class="auto-id-label">🪪 PDF417 + Code 128 barcodes</span>
-        <span class="auto-id-value" style="color: var(--accent-emerald);">✓</span>
+      <div class="feature-row" role="listitem">
+        <span class="feature-label"><svg viewBox="0 0 24 24" stroke="var(--brand-secondary)"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/></svg> PDF417 + Code 128 barcodes</span>
+        <span class="feature-check" aria-label="Available"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
       </div>
-      <div class="auto-id-row">
-        <span class="auto-id-label">🎯 Byte-fidelity real-world engine</span>
-        <span class="auto-id-value" style="color: var(--accent-emerald);">✓</span>
+      <div class="feature-row" role="listitem">
+        <span class="feature-label"><svg viewBox="0 0 24 24" stroke="var(--brand-secondary)"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg> Byte-fidelity real-world engine</span>
+        <span class="feature-check" aria-label="Available"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
       </div>
-      <div class="auto-id-row" style="border-bottom: none;">
-        <span class="auto-id-label">⚡ Auto-gen DD/ICN/Audit/DDB</span>
-        <span class="auto-id-value" style="color: var(--accent-emerald);">✓</span>
+      <div class="feature-row" role="listitem">
+        <span class="feature-label"><svg viewBox="0 0 24 24" stroke="var(--brand-secondary)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Auto-gen DD/ICN/Audit/DDB</span>
+        <span class="feature-check" aria-label="Available"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
       </div>
     </div>
 
-  </div>
+  </main>
 
   <!-- ═══ STATES VIEW ══════════════════════════════════════════ -->
-  <div id="states-view" class="view">
+  <section id="states-view" class="view" aria-label="State selection">
 
     <header class="app-header">
       <div class="app-brand">
-        <div class="app-logo">🗺️</div>
+        <button class="back-btn" onclick="showView('dashboard')" aria-label="Back to dashboard">
+          <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
         <div>
           <div class="app-title">Select State</div>
         </div>
       </div>
       <div class="header-actions">
-        <span class="section-badge" id="state-count">51</span>
+        <span class="section-badge" id="state-count" aria-label="State count">51</span>
       </div>
     </header>
 
     <!-- Mode Selector -->
-    <div class="mode-selector">
-      <button class="mode-btn" data-mode="manual">Manual</button>
-      <button class="mode-btn active" data-mode="semi_auto">Semi-Auto</button>
-      <button class="mode-btn" data-mode="full_auto">Full-Auto</button>
+    <div class="mode-selector" role="radiogroup" aria-label="Generation mode">
+      <button class="mode-btn" data-mode="manual" role="radio" aria-checked="false">Manual</button>
+      <button class="mode-btn active" data-mode="semi_auto" role="radio" aria-checked="true">Semi-Auto</button>
+      <button class="mode-btn" data-mode="full_auto" role="radio" aria-checked="false">Full-Auto</button>
     </div>
 
     <!-- Search -->
     <div class="search-container">
-      <span class="search-icon">🔍</span>
-      <input type="text" class="search-input" id="search-states" placeholder="Search states..." autocomplete="off">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" class="search-input" id="search-states" placeholder="Search states..." autocomplete="off" aria-label="Search states">
     </div>
 
     <!-- State Grid -->
-    <div class="state-grid" id="state-grid">
+    <div class="state-grid" id="state-grid" role="list" aria-label="US States">
       <!-- Rendered by JS -->
     </div>
-  </div>
+  </section>
 
   <!-- ═══ FORM VIEW ════════════════════════════════════════════ -->
-  <div id="form-view" class="view">
+  <section id="form-view" class="view" aria-label="Barcode form">
+
+    <!-- Back button -->
+    <header class="app-header">
+      <div class="app-brand">
+        <button class="back-btn" onclick="showView('states-view')" aria-label="Back to states">
+          <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+      </div>
+    </header>
 
     <!-- Form Header -->
     <div class="form-header">
-      <div class="form-state-badge" id="form-badge">TX</div>
+      <div class="form-state-badge" id="form-badge" aria-hidden="true">TX</div>
       <div class="form-state-info">
         <h2 id="form-title">Texas</h2>
-        <p id="form-subtitle">AAMVA Compliant · PDF417</p>
+        <p id="form-subtitle">AAMVA Compliant &middot; PDF417</p>
       </div>
     </div>
 
     <!-- Progress -->
-    <div class="form-progress">
-      <div class="progress-step current" style="flex: 1;">
-        <div class="stat-meter-fill" id="progress-fill" style="width: 0%; background: var(--accent-cyan); height: 100%; border-radius: 999px;"></div>
-      </div>
+    <div class="form-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
-    <div style="text-align: center; margin-bottom: var(--space-lg);">
+    <div style="text-align:center; margin-bottom:var(--space-4);">
       <span class="progress-label" id="progress-label">0/0 fields</span>
     </div>
 
     <!-- Dynamic Form Fields -->
-    <div id="form-fields">
+    <form id="form-fields" novalidate>
       <!-- Rendered by JS based on selected state -->
-    </div>
-  </div>
+    </form>
+
+    <!-- Generate Button (shown when outside Telegram) -->
+    <button class="generate-btn" id="generate-btn" onclick="submitForm()" aria-label="Generate barcode">
+      <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Generate Barcode
+    </button>
+  </section>
 
 </div>
 
-<!-- Toast -->
-<div id="toast" class="toast"></div>
+<!-- Toast (aria-live for screen reader) -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <!-- App Logic -->
 <script src="js/app.js"></script>
