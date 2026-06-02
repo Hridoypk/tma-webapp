@@ -1249,8 +1249,15 @@ body {
 }
 
 /* ─── 29. Responsive Overrides for ID Boxes ────────────────────── */
+.id-box-full {
+  grid-column: 1 / -1;
+}
+
 @media (max-width: 359px) {
   .id-boxes-grid {
     grid-template-columns: 1fr;
+  }
+  .id-box-full {
+    grid-column: auto;
   }
 }
