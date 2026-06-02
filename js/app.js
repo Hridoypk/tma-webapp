@@ -214,6 +214,9 @@ let formMode = 'semi_auto';
 let tg = null;
 let generatedDLN = '';
 let generatedICN = '';
+let generatedDD = '';
+let generatedIssue = '';
+let generatedExpiry = '';
 
 // ─── Telegram SDK Init ──────────────────────────────────────────
 function initTelegram() {
@@ -289,6 +292,9 @@ function selectState(code) {
   if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
   generatedDLN = '';
   generatedICN = '';
+  generatedDD = '';
+  generatedIssue = '';
+  generatedExpiry = '';
   renderForm(code);
   showView('form-view');
 }
@@ -338,7 +344,12 @@ function renderForm(stateCode) {
 
   let html = '';
 
-  // ── DLN & INC Display Boxes ──
+  // ── ID Display Boxes (DLN, INC, DD, Issue, Expiry) ──
+  const today = new Date();
+  const todayStr = `${padDate(today.getMonth()+1)}/${padDate(today.getDate())}/${today.getFullYear()}`;
+  const expiryDt = new Date(today.getFullYear() + 8, today.getMonth(), today.getDate());
+  const expiryStr = `${padDate(expiryDt.getMonth()+1)}/${padDate(expiryDt.getDate())}/${expiryDt.getFullYear()}`;
+
   html += `
     <div class="id-boxes-grid">
       <div class="id-box">
@@ -357,7 +368,7 @@ function renderForm(stateCode) {
       <div class="id-box">
         <div class="id-box-header">
           <span class="id-box-label">Inventory Control</span>
-          <button class="auto-gen-btn" onclick="autoGenINC()" aria-label="Auto-generate ICN number">
+          <button class="auto-gen-btn" onclick="autoGenINC()" aria-label="Auto-generate ICN">
             <svg width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
             Generate
           </button>
@@ -366,6 +377,45 @@ function renderForm(stateCode) {
           <span class="id-box-placeholder">Click Generate</span>
         </div>
         <div class="id-box-format">10-digit control number</div>
+      </div>
+      <div class="id-box">
+        <div class="id-box-header">
+          <span class="id-box-label">Doc Discriminator</span>
+          <button class="auto-gen-btn" onclick="autoGenDD()" aria-label="Auto-generate doc discriminator">
+            <svg width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
+            Generate
+          </button>
+        </div>
+        <div class="id-box-value" id="dd-display">
+          <span class="id-box-placeholder">Click Generate</span>
+        </div>
+        <div class="id-box-format">Unique document identifier</div>
+      </div>
+      <div class="id-box">
+        <div class="id-box-header">
+          <span class="id-box-label">Issue Date</span>
+          <button class="auto-gen-btn" onclick="autoGenIssue()" aria-label="Auto-generate issue date">
+            <svg width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
+            Generate
+          </button>
+        </div>
+        <div class="id-box-value" id="issue-display">
+          <span class="id-box-placeholder">Click Generate</span>
+        </div>
+        <div class="id-box-format">Default: today (${todayStr})</div>
+      </div>
+      <div class="id-box id-box-full">
+        <div class="id-box-header">
+          <span class="id-box-label">Expiry Date</span>
+          <button class="auto-gen-btn" onclick="autoGenExpiry()" aria-label="Auto-generate expiry date">
+            <svg width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
+            Generate
+          </button>
+        </div>
+        <div class="id-box-value" id="expiry-display">
+          <span class="id-box-placeholder">Click Generate</span>
+        </div>
+        <div class="id-box-format">Default: +8 years (${expiryStr})</div>
       </div>
     </div>`;
 
@@ -418,7 +468,7 @@ function renderForm(stateCode) {
       </div>
       <div class="auto-id-row">
         <span class="auto-id-label">Doc Discriminator</span>
-        <span class="auto-id-value" id="preview-dcf">Auto</span>
+        <span class="auto-id-value" id="preview-dcf">${generatedDD || 'Pending'}</span>
       </div>
       <div class="auto-id-row">
         <span class="auto-id-label">Inventory Control</span>
@@ -426,11 +476,11 @@ function renderForm(stateCode) {
       </div>
       <div class="auto-id-row">
         <span class="auto-id-label">Issue Date</span>
-        <span class="auto-id-value" id="preview-dbd">Auto</span>
+        <span class="auto-id-value" id="preview-dbd">${generatedIssue || 'Pending'}</span>
       </div>
       <div class="auto-id-row">
         <span class="auto-id-label">Expiry Date</span>
-        <span class="auto-id-value" id="preview-dba">Auto</span>
+        <span class="auto-id-value" id="preview-dba">${generatedExpiry || 'Pending'}</span>
       </div>
     </div>`;
 
@@ -497,6 +547,86 @@ function autoGenINC() {
   showToast('ICN generated', 'success');
 }
 
+// ─── Auto-Generate Doc Discriminator ────────────────────────────
+function generateDD(state) {
+  // DD format: typically 10-25 alphanumeric chars, state-specific
+  const dl = generatedDLN || randDigits(8);
+  const iss = new Date();
+  const issStr = `${iss.getFullYear()}${padDate(iss.getMonth()+1)}${padDate(iss.getDate())}`;
+  // Common pattern: issDate + DL fragment + random
+  return (issStr + dl.replace(/[^A-Z0-9]/gi, '').substring(0, 4) + randDigits(6)).substring(0, 20);
+}
+
+function autoGenDD() {
+  if (!selectedState) return;
+  generatedDD = generateDD(selectedState);
+
+  const display = document.getElementById('dd-display');
+  if (display) {
+    display.innerHTML = `<span class="id-box-generated">${generatedDD}</span>`;
+    display.classList.add('flash');
+    setTimeout(() => display.classList.remove('flash'), 300);
+  }
+
+  const preview = document.getElementById('preview-dcf');
+  if (preview) preview.textContent = generatedDD;
+
+  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+  showToast('Doc Discriminator generated', 'success');
+}
+
+// ─── Auto-Generate Issue Date ───────────────────────────────────
+function autoGenIssue() {
+  if (!selectedState) return;
+  // Default: today, or random recent date within last 2 years
+  const now = new Date();
+  const daysBack = Math.floor(Math.random() * 60); // within last 60 days
+  const d = new Date(now.getTime() - daysBack * 86400000);
+  generatedIssue = `${padDate(d.getMonth()+1)}/${padDate(d.getDate())}/${d.getFullYear()}`;
+
+  const display = document.getElementById('issue-display');
+  if (display) {
+    display.innerHTML = `<span class="id-box-generated">${generatedIssue}</span>`;
+    display.classList.add('flash');
+    setTimeout(() => display.classList.remove('flash'), 300);
+  }
+
+  const preview = document.getElementById('preview-dbd');
+  if (preview) preview.textContent = generatedIssue;
+
+  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+  showToast('Issue Date generated', 'success');
+}
+
+// ─── Auto-Generate Expiry Date ──────────────────────────────────
+function autoGenExpiry() {
+  if (!selectedState) return;
+  // Default: issue date + 8 years (most states)
+  const base = generatedIssue ? parseSimpleDate(generatedIssue) : new Date();
+  const expiry = new Date(base.getFullYear() + 8, base.getMonth(), base.getDate());
+  generatedExpiry = `${padDate(expiry.getMonth()+1)}/${padDate(expiry.getDate())}/${expiry.getFullYear()}`;
+
+  const display = document.getElementById('expiry-display');
+  if (display) {
+    display.innerHTML = `<span class="id-box-generated">${generatedExpiry}</span>`;
+    display.classList.add('flash');
+    setTimeout(() => display.classList.remove('flash'), 300);
+  }
+
+  const preview = document.getElementById('preview-dba');
+  if (preview) preview.textContent = generatedExpiry;
+
+  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+  showToast('Expiry Date generated', 'success');
+}
+
+// ─── Parse simple MM/DD/YYYY date ───────────────────────────────
+function parseSimpleDate(str) {
+  const parts = str.split('/');
+  if (parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[0])-1, parseInt(parts[1]));
+  return new Date();
+}
+
 // ─── Auto-Fill Single Field ─────────────────────────────────────
 function autoFillField(key) {
   if (!selectedState) return;
@@ -549,6 +679,9 @@ function submitForm() {
   // Include generated DLN/ICN
   if (generatedDLN) data._dln = generatedDLN;
   if (generatedICN) data._icn = generatedICN;
+  if (generatedDD) data._dd = generatedDD;
+  if (generatedIssue) data._issue = generatedIssue;
+  if (generatedExpiry) data._expiry = generatedExpiry;
 
   if (hasError) {
     showToast('Please fill all required fields', 'error');
