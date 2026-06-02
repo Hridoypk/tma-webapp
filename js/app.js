@@ -572,14 +572,6 @@ function renderForm(stateCode) {
       </div>
     </div>`;
 
-  // ── In-form Submit Button (fallback for Telegram MainButton) ──
-  html += `
-    <button class="form-submit-btn" onclick="submitForm()" type="button"
-            aria-label="Generate barcode">
-      <svg width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
-      Generate Barcode
-    </button>`;
-
   container.innerHTML = html;
   updateFormProgress();
 }
@@ -836,50 +828,30 @@ function submitForm() {
   if (hasError) {
     showToast('Please fill all required fields', 'error');
     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-    // Focus first error field
     const firstErr = document.querySelector('.form-input.error, .form-select.error');
     if (firstErr) firstErr.focus();
     return;
   }
 
-  // Disable in-form button during submission
-  const submitBtn = document.querySelector('.form-submit-btn');
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" class="spin-icon">
-        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-      </svg>
-      Sending...`;
-  }
-
   if (tg) {
     try {
       if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-      if (tg.MainButton) tg.MainButton.showProgress();
+      if (tg.MainButton) {
+        tg.MainButton.showProgress();
+        tg.MainButton.disable();
+      }
       tg.sendData(JSON.stringify(data));
-      // sendData closes the webapp — this line only reached if sendData fails silently
+      // sendData closes the webapp on success
     } catch (e) {
-      showToast('Failed to send data: ' + (e.message || 'Unknown error'), 'error');
-      if (tg.MainButton) tg.MainButton.hideProgress();
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `
-          <svg width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
-          Generate Barcode`;
+      showToast('Failed to send — use bot /generate instead', 'error');
+      if (tg.MainButton) {
+        tg.MainButton.hideProgress();
+        tg.MainButton.enable();
       }
     }
   } else {
     console.log('[TMA Mock] Form data:', JSON.stringify(data, null, 2));
     showToast('Data logged to console (mock mode)', 'success');
-    if (submitBtn) {
-      setTimeout(() => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `
-          <svg width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
-          Generate Barcode`;
-      }, 2000);
-    }
   }
 }
 
