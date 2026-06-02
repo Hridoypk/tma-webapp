@@ -307,23 +307,23 @@ function renderForm(stateCode) {
     <div class="auto-ids-card">
       <div class="auto-ids-title">⚡ Auto-Generated IDs</div>
       <div class="auto-id-row">
-        <span class="auto-id-label">DL Number (DAQ)</span>
+        <span class="auto-id-label">DL Number</span>
         <span class="auto-id-value" id="preview-daq">Auto</span>
       </div>
       <div class="auto-id-row">
-        <span class="auto-id-label">Doc Discriminator (DD)</span>
+        <span class="auto-id-label">Doc Discriminator</span>
         <span class="auto-id-value" id="preview-dcf">Auto</span>
       </div>
       <div class="auto-id-row">
-        <span class="auto-id-label">Inventory Ctrl (ICN)</span>
+        <span class="auto-id-label">Inventory Control</span>
         <span class="auto-id-value" id="preview-dck">Auto</span>
       </div>
       <div class="auto-id-row">
-        <span class="auto-id-label">Issue Date (DBD)</span>
+        <span class="auto-id-label">Issue Date</span>
         <span class="auto-id-value" id="preview-dbd">Auto</span>
       </div>
       <div class="auto-id-row">
-        <span class="auto-id-label">Expiry Date (DBA)</span>
+        <span class="auto-id-label">Expiry Date</span>
         <span class="auto-id-value" id="preview-dba">Auto</span>
       </div>
     </div>`;
