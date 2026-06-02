@@ -304,6 +304,49 @@ function renderDashboard() {
   if (el) el.textContent = user?.first_name || 'User';
   const statEl = document.getElementById('stat-states');
   if (statEl) statEl.textContent = STATES.length;
+
+  // Parse user stats from URL hash (passed by TG.py)
+  // Format: #credits=525.0&today=1&limit=50&tier=premium&total=13
+  const hash = window.location.hash.substring(1);
+  if (hash) {
+    const params = new URLSearchParams(hash);
+    const credits = params.get('credits');
+    const today = params.get('today');
+    const limit = params.get('limit');
+    const tier = params.get('tier');
+    const total = params.get('total');
+
+    if (credits !== null) {
+      const credEl = document.getElementById('stat-credits');
+      if (credEl) credEl.textContent = parseFloat(credits).toFixed(1);
+      const meterCredits = document.getElementById('meter-credits');
+      if (meterCredits) {
+        const pct = Math.min(100, (parseFloat(credits) / 10) * 100);
+        meterCredits.style.width = `${pct}%`;
+      }
+    }
+
+    if (today !== null && limit !== null) {
+      const genEl = document.getElementById('stat-gens');
+      if (genEl) genEl.textContent = `${today}/${limit}`;
+      const meterGens = document.getElementById('meter-gens');
+      if (meterGens) {
+        const pct = Math.min(100, (parseInt(today) / Math.max(parseInt(limit), 1)) * 100);
+        meterGens.style.width = `${pct}%`;
+      }
+    }
+
+    if (tier !== null) {
+      const tierEl = document.getElementById('stat-tier');
+      if (tierEl) tierEl.textContent = tier === 'premium' ? 'Premium' : 'Free';
+      const meterTier = document.getElementById('meter-tier');
+      if (meterTier) meterTier.style.width = tier === 'premium' ? '100%' : '33%';
+    }
+  }
+
+  // Update version display
+  const verEl = document.getElementById('app-version');
+  if (verEl) verEl.textContent = 'v18.1';
 }
 
 // ─── State Grid ─────────────────────────────────────────────────
@@ -529,6 +572,14 @@ function renderForm(stateCode) {
       </div>
     </div>`;
 
+  // ── In-form Submit Button (fallback for Telegram MainButton) ──
+  html += `
+    <button class="form-submit-btn" onclick="submitForm()" type="button"
+            aria-label="Generate barcode">
+      <svg width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
+      Generate Barcode
+    </button>`;
+
   container.innerHTML = html;
   updateFormProgress();
 }
@@ -674,6 +725,53 @@ function parseSimpleDate(str) {
   return new Date();
 }
 
+// ─── Manual Edit Handler for ID Boxes ───────────────────────────
+function onIdBoxEdit(field, value) {
+  const val = value.trim();
+
+  // Sync manual input to the generated* variable
+  switch (field) {
+    case 'dln':
+      generatedDLN = val;
+      const pDln = document.getElementById('preview-daq');
+      if (pDln) pDln.textContent = val || 'Pending';
+      break;
+    case 'icn':
+      generatedICN = val;
+      const pIcn = document.getElementById('preview-dck');
+      if (pIcn) pIcn.textContent = val || 'Pending';
+      break;
+    case 'dd':
+      generatedDD = val;
+      const pDd = document.getElementById('preview-dcf');
+      if (pDd) pDd.textContent = val || 'Pending';
+      break;
+    case 'issue':
+      generatedIssue = val;
+      const pIss = document.getElementById('preview-dbd');
+      if (pIss) pIss.textContent = val || 'Pending';
+      // Auto-cascade: recalculate expiry when issue date changes
+      if (val && selectedState) {
+        const parsed = parseSimpleDate(val);
+        if (!isNaN(parsed.getTime())) {
+          const expiryYrs = selectedState.expiryYears || 8;
+          const exp = new Date(parsed.getFullYear() + expiryYrs, parsed.getMonth(), parsed.getDate());
+          generatedExpiry = `${padDate(exp.getMonth()+1)}/${padDate(exp.getDate())}/${exp.getFullYear()}`;
+          const expDisplay = document.getElementById('expiry-display');
+          if (expDisplay) expDisplay.value = generatedExpiry;
+          const pExp = document.getElementById('preview-dba');
+          if (pExp) pExp.textContent = generatedExpiry;
+        }
+      }
+      break;
+    case 'expiry':
+      generatedExpiry = val;
+      const pExpy = document.getElementById('preview-dba');
+      if (pExpy) pExpy.textContent = val || 'Pending';
+      break;
+  }
+}
+
 // ─── Auto-Fill Single Field ─────────────────────────────────────
 function autoFillField(key) {
   if (!selectedState) return;
@@ -723,12 +821,17 @@ function submitForm() {
     if (val) data[key] = val;
   });
 
-  // Include generated DLN/ICN
-  if (generatedDLN) data._dln = generatedDLN;
-  if (generatedICN) data._icn = generatedICN;
-  if (generatedDD) data._dd = generatedDD;
-  if (generatedIssue) data._issue = generatedIssue;
-  if (generatedExpiry) data._expiry = generatedExpiry;
+  // Include ID box values (prefer input value, fallback to generated* variable)
+  const dlnVal = document.getElementById('dln-display')?.value?.trim() || generatedDLN;
+  const icnVal = document.getElementById('icn-display')?.value?.trim() || generatedICN;
+  const ddVal = document.getElementById('dd-display')?.value?.trim() || generatedDD;
+  const issueVal = document.getElementById('issue-display')?.value?.trim() || generatedIssue;
+  const expiryVal = document.getElementById('expiry-display')?.value?.trim() || generatedExpiry;
+  if (dlnVal) data._dln = dlnVal;
+  if (icnVal) data._icn = icnVal;
+  if (ddVal) data._dd = ddVal;
+  if (issueVal) data._issue = issueVal;
+  if (expiryVal) data._expiry = expiryVal;
 
   if (hasError) {
     showToast('Please fill all required fields', 'error');
@@ -739,18 +842,44 @@ function submitForm() {
     return;
   }
 
+  // Disable in-form button during submission
+  const submitBtn = document.querySelector('.form-submit-btn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" class="spin-icon">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      Sending...`;
+  }
+
   if (tg) {
-    tg.HapticFeedback.notificationOccurred('success');
-    tg.MainButton.showProgress();
     try {
+      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      if (tg.MainButton) tg.MainButton.showProgress();
       tg.sendData(JSON.stringify(data));
+      // sendData closes the webapp — this line only reached if sendData fails silently
     } catch (e) {
-      showToast('Failed to send data', 'error');
-      tg.MainButton.hideProgress();
+      showToast('Failed to send data: ' + (e.message || 'Unknown error'), 'error');
+      if (tg.MainButton) tg.MainButton.hideProgress();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <svg width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
+          Generate Barcode`;
+      }
     }
   } else {
     console.log('[TMA Mock] Form data:', JSON.stringify(data, null, 2));
     showToast('Data logged to console (mock mode)', 'success');
+    if (submitBtn) {
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <svg width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
+          Generate Barcode`;
+      }, 2000);
+    }
   }
 }
 
