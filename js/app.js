@@ -194,8 +194,12 @@ function renderStateGrid(filter = '') {
     s.code.toLowerCase().includes(filter.toLowerCase())
   );
 
-  grid.innerHTML = filtered.map(s => `
-    <div class="state-card ${s.tag ? 'new-tag' : ''}" data-code="${s.code}" onclick="selectState('${s.code}')">
+  grid.innerHTML = filtered.map((s, i) => `
+    <div class="state-card ${s.tag ? 'new-tag' : ''}" data-code="${s.code}"
+         onclick="selectState('${s.code}')"
+         role="listitem" tabindex="0"
+         aria-label="${s.name}"
+         style="animation-delay: ${Math.min(i * 20, 400)}ms">
       <span class="state-code">${s.code}</span>
       <span class="state-name">${s.name}</span>
       <span class="state-status ${s.status}"></span>
@@ -236,11 +240,18 @@ function renderForm(stateCode) {
 
   // Build sections
   const sections = { personal: [], physical: [], address: [], document: [] };
+  // SVG icons for section headers (no emoji per UX skill)
+  const sectionIcons = {
+    personal: '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    physical: '<svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>',
+    address: '<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    document: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+  };
   const sectionLabels = {
-    personal: '👤 Personal Information',
-    physical: '📏 Physical Description',
-    address: '📍 Address',
-    document: '📄 Document Details'
+    personal: 'Personal Information',
+    physical: 'Physical Description',
+    address: 'Address',
+    document: 'Document Details'
   };
 
   // Add mandatory fields
@@ -268,7 +279,7 @@ function renderForm(stateCode) {
     if (fields.length === 0) continue;
 
     html += `<div class="form-section">
-      <div class="form-section-title">${sectionLabels[sectionKey]}</div>
+      <div class="form-section-title">${sectionIcons[sectionKey]} ${sectionLabels[sectionKey]}</div>
       <div class="form-row">`;
 
     fields.forEach((f, i) => {
@@ -278,7 +289,7 @@ function renderForm(stateCode) {
       }
 
       html += `<div class="form-group">
-        <label class="form-label">${f.label} ${f.required ? '<span class="required">*</span>' : ''}</label>`;
+        <label class="form-label" for="field-${f.key}">${f.label} ${f.required ? '<span class="required">*</span>' : ''}</label>`;
 
       if (f.type === 'select' && f.options) {
         html += `<select class="form-select" id="field-${f.key}" data-field="${f.key}" ${f.required ? 'required' : ''}>
@@ -305,7 +316,10 @@ function renderForm(stateCode) {
   // Auto-ID preview
   html += `
     <div class="auto-ids-card">
-      <div class="auto-ids-title">⚡ Auto-Generated IDs</div>
+      <div class="auto-ids-title">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Auto-Generated IDs
+      </div>
       <div class="auto-id-row">
         <span class="auto-id-label">DL Number</span>
         <span class="auto-id-value" id="preview-daq">Auto</span>
