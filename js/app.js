@@ -110,7 +110,7 @@ const FIELD_DEFS = {
   DCD: { label:"Endorsements", type:"text", placeholder:"NONE", required:false, section:"document" },
   DDK: { label:"Organ Donor", type:"select", options:[["0","No"],["1","Yes"]], required:false, section:"physical" },
   DCU: { label:"Name Suffix", type:"text", placeholder:"JR, SR, III", required:false, section:"personal" },
-  DCE: { label:"Weight Range", type:"select", options:[["0","≤70"],["1","71-100"],["2","101-130"],["3","131-160"],["4","161-190"],["5","191-220"],["6","221-250"],["7","251-280"],["8","281-320"],["9","321+"]], required:false, section:"physical" },
+  DCE: { label:"Weight Range", type:"select", options:[["0","up to 31 kg (up to 70 lbs)"],["1","32–45 kg (71–100 lbs)"],["2","46–59 kg (101–130 lbs)"],["3","60–70 kg (131–160 lbs)"],["4","71–86 kg (161–190 lbs)"],["5","87–100 kg (191–220 lbs)"],["6","101–113 kg (221–250 lbs)"],["7","114–127 kg (251–280 lbs)"],["8","128–145 kg (281–320 lbs)"],["9","146+ kg (321+ lbs)"]], required:false, section:"physical" },
   DCL: { label:"Race/Ethnicity", type:"select", options:[["W","White"],["B","Black"],["H","Hispanic"],["A","Asian"],["I","Native American"],["U","Unknown"]], required:false, section:"physical" },
 };
 
