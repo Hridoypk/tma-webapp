@@ -865,7 +865,7 @@ function onIdBoxEdit(field, value) {
   }
 }
 
-// ─── Auto-Fill Single Field ─────────────────────────────────────
+// ─── Auto-Fill Single Field (blur-mask transition per SKILL.md) ─
 function autoFillField(key) {
   if (!selectedState) return;
   const el = document.getElementById(`field-${key}`);
@@ -873,9 +873,14 @@ function autoFillField(key) {
 
   const val = autoGenField(key, selectedState.code);
   if (val) {
-    el.value = val;
-    el.classList.add('auto-filled');
-    setTimeout(() => el.classList.remove('auto-filled'), 600);
+    // Brief blur masks the value change (Emil's blur trick)
+    el.classList.add('auto-filling');
+    setTimeout(() => {
+      el.value = val;
+      el.classList.remove('auto-filling');
+      el.classList.add('auto-filled');
+      setTimeout(() => el.classList.remove('auto-filled'), 800);
+    }, 120);
     updateFormProgress();
     if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
   }
