@@ -99,8 +99,8 @@ const FIELD_DEFS = {
   DBB: { label:"Date of Birth", type:"date", placeholder:"MM/DD/YYYY", required:true, section:"personal", autoGen:true },
   DAU: { label:"Height (in)", type:"text", placeholder:"510", required:true, section:"physical", autoGen:true },
   DAW: { label:"Weight (lbs)", type:"number", placeholder:"180", required:false, section:"physical" },
-  DAY: { label:"Eye Color", type:"select", options:[["BLK","Black"],["BLU","Blue"],["BRO","Brown"],["GRY","Gray"],["GRN","Green"],["HAZ","Hazel"]], required:true, section:"physical" },
-  DAZ: { label:"Hair Color", type:"select", options:[["BAL","Bald"],["BLK","Black"],["BLN","Blond"],["BRO","Brown"],["GRY","Gray"],["RED","Red"],["WHI","White"]], required:false, section:"physical" },
+  DAY: { label:"Eye Color", type:"select", options:[["BLK","Black"],["BLU","Blue"],["BRO","Brown"],["GRY","Gray"],["GRN","Green"],["HAZ","Hazel"],["MAR","Maroon"],["PNK","Pink"],["DIC","Dichromatic"],["UNK","Unknown"]], required:true, section:"physical" },
+  DAZ: { label:"Hair Color", type:"select", options:[["BAL","Bald"],["BLK","Black"],["BLN","Blond"],["BRO","Brown"],["GRY","Gray"],["RED","Red"],["SDY","Sandy"],["WHI","White"],["UNK","Unknown"]], required:false, section:"physical" },
   DAG: { label:"Street Address", type:"text", placeholder:"123 MAIN ST", required:true, section:"address", autoGen:true },
   DAH: { label:"Address Line 2", type:"text", placeholder:"APT 4B", required:false, section:"address" },
   DAI: { label:"City", type:"text", placeholder:"HOUSTON", required:true, section:"address", autoGen:true },
@@ -120,7 +120,7 @@ const DEFAULT_OPTIONAL  = ["DAD","DAW","DAZ","DCB","DCD"];
 // Per-state field configs — ALL 51 states from TG.py STATE_FIELD_REQS
 const STATE_FIELDS = {
   TX: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCL","DDK","DCB","DCD"] },
-  FL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  FL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAW","DAZ","DCB","DCD"] },
   AR: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
   CO: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCL","DCU","DCB","DCD"] },
   IA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
@@ -134,12 +134,12 @@ const STATE_FIELDS = {
   IL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
   OH: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCE","DCU","DDK","DCB","DCD"] },
   NC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCL","DDK","DCB","DCD"] },
-  NE: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAZ","DCE","DCL","DCB","DCD"] },
+  NE: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCE","DCL","DCB","DCD"] },
   MO: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DCU","DDK","DCB","DCD"] },
   MA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
   NH: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
   WY: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
-  MI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
+  MI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
   MD: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
   AK: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
   GA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
@@ -151,7 +151,7 @@ const STATE_FIELDS = {
   MN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
   WI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
   TN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
-  OR: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
+  OR: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
   OK: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
   WV: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAZ","DCB","DCD"] },
   AZ: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
@@ -206,13 +206,28 @@ function generateDLN(state, lastName) {
   return randDigits(8);
 }
 
-// ─── ICN Generator ──────────────────────────────────────────────
+// ─── ICN Generator (mirrors DocEngine.gen_icn per state) ────────
 function generateICN(state) {
-  // Most states: 10-digit number, some use specific prefixes
-  const prefixes = { FL:'FL', CA:'', TX:'', NY:'', IL:'', PA:'' };
-  const prefix = prefixes[state.code] || '';
-  const digits = prefix ? 10 - prefix.length : 10;
-  return prefix + randDigits(digits);
+  const code = state.code;
+  switch(code) {
+    case 'TX': return randDigits(11);
+    case 'FL': return '0100' + randDigits(12);
+    case 'AR': return '02101' + randDigits(11);
+    case 'IN': return '0370' + randDigits(12);
+    case 'PA': return '0250' + randDigits(12);
+    case 'MD': return '100' + randDigits(7);
+    case 'AK': return '1000' + randDigits(6);
+    case 'GA': return randDigits(16);
+    case 'MS': return '0510' + randDigits(12);
+    case 'NV': return '001' + randDigits(10);
+    case 'NJ': return randLetters(4) + randDigits(14);
+    case 'VA': return '0060' + randDigits(12);
+    case 'WI': return '0130' + randDigits(12);
+    case 'NE': return '0540' + randDigits(12);
+    case 'SD': return '0420' + randDigits(12);
+    case 'NH': return randDigits(8);
+    default:   return code + randDigits(11);
+  }
 }
 
 // ─── Auto-Generate Field Values ─────────────────────────────────
@@ -246,7 +261,29 @@ function autoGenField(key, stateCode) {
     return cities[Math.floor(Math.random() * cities.length)];
   }
   if (key === 'DAK') {
-    return randDigits(5) + '0000';
+    const ZIP_PREFIXES = {
+      TX:['750','770','762'],FL:['330','336','321'],CA:['900','913','945'],
+      NY:['100','112','113'],IL:['600','606','627'],PA:['190','191','194'],
+      OH:['432','440','453'],MI:['482','483','484'],GA:['300','310','312'],
+      NC:['270','275','279'],NJ:['070','071','082'],VA:['220','221','201'],
+      WA:['980','981','986'],AZ:['850','852','857'],MA:['021','020','027'],
+      TN:['370','371','372'],IN:['460','461','462'],MO:['641','652','658'],
+      MD:['212','211','210'],WI:['530','531','535'],CO:['800','801','802'],
+      MN:['550','551','553'],SC:['290','291','292'],AL:['350','360','356'],
+      LA:['700','701','710'],KY:['400','410','420'],OR:['970','971','972'],
+      OK:['740','731','730'],CT:['060','061','062'],UT:['840','841','846'],
+      IA:['520','521','503'],NV:['891','890','895'],AR:['716','722','720'],
+      MS:['390','391','387'],KS:['662','660','672'],NE:['680','681','689'],
+      NM:['870','871','873'],WV:['253','254','255'],ID:['832','833','836'],
+      HI:['967','968'],ME:['039','040','041'],NH:['030','031','038'],
+      RI:['028','029'],MT:['590','591','592'],DE:['197','198','199'],
+      SD:['571','572','575'],ND:['580','581','582'],AK:['995','996','997'],
+      DC:['200','201','202'],VT:['050','051','054'],WY:['820','821','825']
+    };
+    const prefixes = ZIP_PREFIXES[stateCode] || ['000'];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    if (stateCode === 'HI') return prefix + randDigits(2);
+    return prefix + randDigits(6);
   }
   return '';
 }
@@ -435,7 +472,13 @@ function renderForm(stateCode) {
   const today = new Date();
   const todayStr = `${padDate(today.getMonth()+1)}/${padDate(today.getDate())}/${today.getFullYear()}`;
   const expiryYrs = state.expiryYears || 8;
-  const expiryDt = new Date(today.getFullYear() + expiryYrs, today.getMonth(), today.getDate());
+  let expiryDt;
+  if (state.code === 'AZ') {
+    // Arizona: default expiry hint is +65 years from a sample DOB
+    expiryDt = new Date(today.getFullYear() + 12, today.getMonth(), today.getDate());
+  } else {
+    expiryDt = new Date(today.getFullYear() + expiryYrs, today.getMonth(), today.getDate());
+  }
   const expiryStr = `${padDate(expiryDt.getMonth()+1)}/${padDate(expiryDt.getDate())}/${expiryDt.getFullYear()}`;
 
   html += `
@@ -636,14 +679,45 @@ function autoGenINC() {
   showToast('ICN generated', 'success');
 }
 
-// ─── Auto-Generate Doc Discriminator ────────────────────────────
+// ─── Doc Discriminator Generator (mirrors DocEngine.gen_dd) ─────
 function generateDD(state) {
-  // DD format: typically 10-25 alphanumeric chars, state-specific
   const dl = generatedDLN || randDigits(8);
   const iss = new Date();
-  const issStr = `${iss.getFullYear()}${padDate(iss.getMonth()+1)}${padDate(iss.getDate())}`;
-  // Common pattern: issDate + DL fragment + random
-  return (issStr + dl.replace(/[^A-Z0-9]/gi, '').substring(0, 4) + randDigits(6)).substring(0, 20);
+  const yy = String(iss.getFullYear()).slice(-2);
+  const mm = padDate(iss.getMonth()+1);
+  const dd = padDate(iss.getDate());
+  const code = state.code;
+
+  switch(code) {
+    case 'TX': return randDigits(12) + ' ' + randDigits(8);
+    case 'FL': return randLetter() + randDigits(2) + yy + mm + dd + randDigits(4);
+    case 'AR': return randDigits(10) + ' ' + randDigits(2) + yy;
+    case 'CO': return randDigits(7);
+    case 'IN': return mm + dd + randDigits(10);
+    case 'PA': return randDigits(12) + ' ' + randDigits(13);
+    case 'MD': return randLetters(3) + randDigits(6);
+    case 'DC': return randDigits(8);
+    case 'GA': return randDigits(18);
+    case 'NV': return randDigits(12) + ' ' + randDigits(9);
+    case 'NJ': return 'CP' + iss.getFullYear() + randDigits(11);
+    case 'SC': return randDigits(19);
+    case 'UT': return randDigits(8);
+    case 'VA': return randDigits(9);
+    case 'MO': return yy + randDigits(10);
+    case 'NC': return randDigits(10);
+    case 'TN': return randDigits(16);
+    case 'NH': return randDigits(8);
+    case 'RI': return randDigits(7);
+    case 'WY': return randDigits(8);
+    case 'OR': return '';  // Oregon uses DAA instead
+    case 'MI': return '';  // Michigan: empty DD
+    case 'OK': return '';  // Oklahoma: empty DD
+    case 'MN': return String(Math.floor(Math.random() * 99999999)).padStart(14, '0');
+    default: {
+      const issStr = `${iss.getFullYear()}${mm}${dd}`;
+      return (issStr + dl.replace(/[^A-Z0-9]/gi, '').substring(0, 4) + randDigits(6)).substring(0, 20);
+    }
+  }
 }
 
 function autoGenDD() {
@@ -690,10 +764,25 @@ function autoGenIssue() {
 // ─── Auto-Generate Expiry Date ──────────────────────────────────
 function autoGenExpiry() {
   if (!selectedState) return;
-  // Default: issue date + state-specific expiry years
   const base = generatedIssue ? parseSimpleDate(generatedIssue) : new Date();
-  const expiryYrs = selectedState?.expiryYears || 8;
-  const expiry = new Date(base.getFullYear() + expiryYrs, base.getMonth(), base.getDate());
+  let expiry;
+
+  if (selectedState.code === 'AZ') {
+    // Arizona: expires at age 65 (calculated from DOB)
+    const dobEl = document.getElementById('field-DBB');
+    const dobVal = dobEl?.value?.trim();
+    if (dobVal) {
+      const dob = parseSimpleDate(dobVal);
+      expiry = new Date(dob.getFullYear() + 65, dob.getMonth(), dob.getDate());
+    } else {
+      // Fallback if no DOB entered yet
+      expiry = new Date(base.getFullYear() + 12, base.getMonth(), base.getDate());
+    }
+  } else {
+    const expiryYrs = selectedState?.expiryYears || 8;
+    expiry = new Date(base.getFullYear() + expiryYrs, base.getMonth(), base.getDate());
+  }
+
   generatedExpiry = `${padDate(expiry.getMonth()+1)}/${padDate(expiry.getDate())}/${expiry.getFullYear()}`;
 
   const display = document.getElementById('expiry-display');
@@ -746,8 +835,20 @@ function onIdBoxEdit(field, value) {
       if (val && selectedState) {
         const parsed = parseSimpleDate(val);
         if (!isNaN(parsed.getTime())) {
-          const expiryYrs = selectedState.expiryYears || 8;
-          const exp = new Date(parsed.getFullYear() + expiryYrs, parsed.getMonth(), parsed.getDate());
+          let exp;
+          if (selectedState.code === 'AZ') {
+            const dobEl = document.getElementById('field-DBB');
+            const dobVal = dobEl?.value?.trim();
+            if (dobVal) {
+              const dob = parseSimpleDate(dobVal);
+              exp = new Date(dob.getFullYear() + 65, dob.getMonth(), dob.getDate());
+            } else {
+              exp = new Date(parsed.getFullYear() + 12, parsed.getMonth(), parsed.getDate());
+            }
+          } else {
+            const expiryYrs = selectedState.expiryYears || 8;
+            exp = new Date(parsed.getFullYear() + expiryYrs, parsed.getMonth(), parsed.getDate());
+          }
           generatedExpiry = `${padDate(exp.getMonth()+1)}/${padDate(exp.getDate())}/${exp.getFullYear()}`;
           const expDisplay = document.getElementById('expiry-display');
           if (expDisplay) expDisplay.value = generatedExpiry;
@@ -798,7 +899,7 @@ function submitForm() {
   if (!selectedState) return;
 
   const fields = document.querySelectorAll('#form-fields [data-field]');
-  const data = { state: selectedState.code };
+  const data = { state: selectedState.code, mode: formMode };
   let hasError = false;
 
   fields.forEach(el => {
@@ -809,6 +910,20 @@ function submitForm() {
       hasError = true;
     } else {
       el.classList.remove('error');
+    }
+    // Format validation for date fields (MM/DD/YYYY)
+    if (val && (key === 'DBB' || key === 'DBD' || key === 'DBA')) {
+      if (!/^\d{2}\/\d{2}\/\d{4}$/.test(val) && !/^\d{8}$/.test(val)) {
+        el.classList.add('error');
+        hasError = true;
+      }
+    }
+    // Height validation (3 digits like 510, 601, etc.)
+    if (val && key === 'DAU') {
+      if (!/^\d{3}(\s*in)?$/.test(val)) {
+        el.classList.add('error');
+        hasError = true;
+      }
     }
     if (val) data[key] = val;
   });
