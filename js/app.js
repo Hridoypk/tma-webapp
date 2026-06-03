@@ -105,7 +105,7 @@ const FIELD_DEFS = {
   DAH: { label:"Address Line 2", type:"text", placeholder:"APT 4B", required:false, section:"address" },
   DAI: { label:"City", type:"text", placeholder:"HOUSTON", required:true, section:"address", autoGen:true },
   DAK: { label:"ZIP Code", type:"text", placeholder:"770010000", required:true, section:"address", autoGen:true },
-  DCA: { label:"DL Class", type:"text", placeholder:"C", required:true, section:"document" },
+  DCA: { label:"DL Class", type:"text", placeholder:"D", required:true, section:"document" },
   DCB: { label:"Restrictions", type:"text", placeholder:"NONE", required:false, section:"document" },
   DCD: { label:"Endorsements", type:"text", placeholder:"NONE", required:false, section:"document" },
   DDK: { label:"Organ Donor", type:"select", options:[["0","No"],["1","Yes"]], required:false, section:"physical" },
@@ -126,7 +126,7 @@ const STATE_FIELDS = {
   IA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
   IN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
   PA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  NV: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAZ","DCE","DCU","DCB","DCD"] },
+  NV: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAW","DAZ","DCE","DCU","DCB","DCD"] },
   DC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
   SC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DCL","DDK","DCB","DCD"] },
   WA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DDK","DCB","DCD"] },
@@ -134,7 +134,7 @@ const STATE_FIELDS = {
   IL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
   OH: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCE","DCU","DDK","DCB","DCD"] },
   NC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCL","DDK","DCB","DCD"] },
-  NE: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCE","DCL","DCB","DCD"] },
+  NE: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCE","DCL","DCB","DCD"] },
   MO: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DCU","DDK","DCB","DCD"] },
   MA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
   NH: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
@@ -453,14 +453,31 @@ function renderForm(stateCode) {
     address:  'Address',
     document: 'Document Details'
   };
+  // State-specific defaults from TG.py StateProfile
+  // default_class='D' in TG.py unless overridden, default_restrict='NONE'
+  const STATE_DEFAULTS = {
+    TX: { DCA:'C' },     // default_class="C"
+    FL: { DCA:'E', DCB:'A' },  // default_class="E", default_restrict="A"
+    CA: { DCA:'C' },     // default_class="C"
+    PA: { DCA:'C' },     // default_class="C"
+    AR: { DCA:'D' },     // explicit default_class="D"
+  };
+  const stDefaults = STATE_DEFAULTS[stateCode] || {};
+  // Date format for OR/WY (CCYYMMDD) — inform the user
+  const dateYYYYfirst = (stateCode === 'OR' || stateCode === 'WY');
 
   config.mandatory.forEach(key => {
-    const def = FIELD_DEFS[key];
-    if (def) sections[def.section].push({ key, ...def, required: true });
+    const def = { ...FIELD_DEFS[key] };
+    if (!def.label) return;
+    if (stDefaults[key]) def.placeholder = stDefaults[key];
+    if (dateYYYYfirst && key === 'DBB') def.placeholder = 'YYYY/MM/DD';
+    sections[def.section].push({ key, ...def, required: true });
   });
   config.optional.forEach(key => {
-    const def = FIELD_DEFS[key];
-    if (def) sections[def.section].push({ key, ...def, required: false });
+    const def = { ...FIELD_DEFS[key] };
+    if (!def.label) return;
+    if (stDefaults[key]) def.placeholder = stDefaults[key];
+    sections[def.section].push({ key, ...def, required: false });
   });
 
   const container = document.getElementById('form-fields');
