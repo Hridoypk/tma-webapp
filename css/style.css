@@ -1,1068 +1,1414 @@
-/* ══════════════════════════════════════════════════════════════════
-   AAMVA Premium — Telegram Mini App Logic v2
-   Features:
-   - Per-state distinct forms with state-specific field configs
-   - Auto-Generate buttons for DOB, Name, Height, Issue/Expiry dates
-   - DLN and INC display boxes with auto-generate
-   - State-aware DL number format patterns (mirrors TG.py DocEngine)
-   ══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   AAMVA Premium TMA v2 — Design System
+   Following SKILL-UxUi.md guidelines:
+   - Semantic color tokens (no raw hex in components)
+   - 8dp spacing rhythm
+   - SVG icons (Lucide) — no emoji
+   - Touch targets ≥ 44px
+   - Contrast ≥ 4.5:1 (AA)
+   - Spring-physics animations 150-300ms
+   - Safe-area compliance
+   ═══════════════════════════════════════════════════════════════ */
 
-// ─── Helpers ────────────────────────────────────────────────────
-const randDigits = (n) => Array.from({length:n}, () => Math.floor(Math.random()*10)).join('');
-const randLetter = () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random()*26)];
-const randLetters = (n=1) => Array.from({length:n}, randLetter).join('');
-const padDate = (d) => String(d).padStart(2, '0');
+/* ─── 1. Design Tokens ─────────────────────────────────────────── */
+:root {
+  /* Surface palette — dark mode first */
+  --surface-base: #0a0e14;
+  --surface-1: #111820;
+  --surface-2: #1a2230;
+  --surface-3: #232e3e;
+  --surface-elevated: #1e2a3a;
 
-// ─── Faker Data for Auto-Generate ───────────────────────────────
-const FAKE_FIRST_NAMES_M = ['JAMES','JOHN','ROBERT','MICHAEL','WILLIAM','DAVID','RICHARD','JOSEPH','THOMAS','CHRISTOPHER','CHARLES','DANIEL','MATTHEW','ANTHONY','MARK','DONALD','STEVEN','PAUL','ANDREW','JOSHUA'];
-const FAKE_FIRST_NAMES_F = ['MARY','PATRICIA','JENNIFER','LINDA','BARBARA','ELIZABETH','SUSAN','JESSICA','SARAH','KAREN','LISA','NANCY','BETTY','MARGARET','SANDRA','ASHLEY','DOROTHY','KIMBERLY','EMILY','DONNA'];
-const FAKE_LAST_NAMES = ['SMITH','JOHNSON','WILLIAMS','BROWN','JONES','GARCIA','MILLER','DAVIS','RODRIGUEZ','MARTINEZ','HERNANDEZ','LOPEZ','GONZALEZ','WILSON','ANDERSON','THOMAS','TAYLOR','MOORE','JACKSON','MARTIN','LEE','PEREZ','THOMPSON','WHITE','HARRIS','SANCHEZ','CLARK','RAMIREZ','LEWIS','ROBINSON','WALKER','YOUNG','ALLEN','KING','WRIGHT','SCOTT','TORRES','NGUYEN','HILL','FLORES','GREEN','ADAMS','NELSON','BAKER','HALL','RIVERA','CAMPBELL','MITCHELL','CARTER','ROBERTS'];
-const FAKE_STREETS = ['MAIN ST','OAK AVE','MAPLE DR','CEDAR LN','ELM ST','PINE RD','WALNUT BLVD','BIRCH WAY','ASH ST','WILLOW CT','SPRING CREEK DR','SUNSET BLVD','PARK AVE','LAKE VIEW DR','HIGHLAND AVE','RIVER RD','FOREST LN','VALLEY DR','HILL ST','MEADOW LN'];
-const FAKE_CITIES = {
-  AL:['BIRMINGHAM','MONTGOMERY','HUNTSVILLE','MOBILE','TUSCALOOSA'],AK:['ANCHORAGE','JUNEAU','FAIRBANKS'],AZ:['PHOENIX','TUCSON','MESA','SCOTTSDALE','CHANDLER'],
-  AR:['LITTLE ROCK','FORT SMITH','FAYETTEVILLE'],CA:['LOS ANGELES','SAN FRANCISCO','SAN DIEGO','SAN JOSE','SACRAMENTO'],CO:['DENVER','COLORADO SPRINGS','AURORA'],
-  CT:['BRIDGEPORT','NEW HAVEN','HARTFORD'],DE:['WILMINGTON','DOVER','NEWARK'],DC:['WASHINGTON'],FL:['MIAMI','JACKSONVILLE','TAMPA','ORLANDO','ST PETERSBURG'],
-  GA:['ATLANTA','AUGUSTA','COLUMBUS','SAVANNAH'],HI:['HONOLULU','HILO','KAILUA'],ID:['BOISE','MERIDIAN','NAMPA'],IL:['CHICAGO','AURORA','NAPERVILLE','SPRINGFIELD'],
-  IN:['INDIANAPOLIS','FORT WAYNE','EVANSVILLE'],IA:['DES MOINES','CEDAR RAPIDS','DAVENPORT'],KS:['WICHITA','OVERLAND PARK','KANSAS CITY'],KY:['LOUISVILLE','LEXINGTON','BOWLING GREEN'],
-  LA:['NEW ORLEANS','BATON ROUGE','SHREVEPORT'],ME:['PORTLAND','LEWISTON','BANGOR'],MD:['BALTIMORE','FREDERICK','ROCKVILLE'],MA:['BOSTON','WORCESTER','SPRINGFIELD'],
-  MI:['DETROIT','GRAND RAPIDS','ANN ARBOR'],MN:['MINNEAPOLIS','ST PAUL','ROCHESTER'],MS:['JACKSON','GULFPORT','SOUTHAVEN'],MO:['KANSAS CITY','ST LOUIS','SPRINGFIELD'],
-  MT:['BILLINGS','MISSOULA','GREAT FALLS'],NE:['OMAHA','LINCOLN','BELLEVUE'],NV:['LAS VEGAS','HENDERSON','RENO'],NH:['MANCHESTER','NASHUA','CONCORD'],
-  NJ:['NEWARK','JERSEY CITY','PATERSON'],NM:['ALBUQUERQUE','LAS CRUCES','SANTA FE'],NY:['NEW YORK','BUFFALO','ROCHESTER','ALBANY'],NC:['CHARLOTTE','RALEIGH','GREENSBORO'],
-  ND:['FARGO','BISMARCK','GRAND FORKS'],OH:['COLUMBUS','CLEVELAND','CINCINNATI'],OK:['OKLAHOMA CITY','TULSA','NORMAN'],OR:['PORTLAND','EUGENE','SALEM'],
-  PA:['PHILADELPHIA','PITTSBURGH','ALLENTOWN'],RI:['PROVIDENCE','WARWICK','CRANSTON'],SC:['COLUMBIA','CHARLESTON','GREENVILLE'],SD:['SIOUX FALLS','RAPID CITY'],
-  TN:['NASHVILLE','MEMPHIS','KNOXVILLE'],TX:['HOUSTON','SAN ANTONIO','DALLAS','AUSTIN','FORT WORTH','EL PASO'],UT:['SALT LAKE CITY','WEST VALLEY CITY','PROVO'],
-  VT:['BURLINGTON','SOUTH BURLINGTON'],VA:['VIRGINIA BEACH','NORFOLK','CHESAPEAKE','RICHMOND'],WA:['SEATTLE','SPOKANE','TACOMA'],WV:['CHARLESTON','HUNTINGTON'],
-  WI:['MILWAUKEE','MADISON','GREEN BAY'],WY:['CHEYENNE','CASPER','LARAMIE']
-};
+  /* Text — ensures ≥ 4.5:1 on surface-base */
+  --text-primary: #f0f4f8;     /* 15.2:1 */
+  --text-secondary: #94a3b8;   /* 5.1:1  */
+  --text-tertiary: #64748b;    /* 3.3:1  */
+  --text-on-accent: #0a0e14;
 
-// ─── State Data with DL formats (mirrors TG.py StateProfile) ────
-const STATES = [
-  { code:"AL", name:"Alabama", dlFormat:"digits:7", rev:"2022", expiryYears:4 },
-  { code:"AK", name:"Alaska", dlFormat:"digits:7", rev:"2018", expiryYears:8 },
-  { code:"AZ", name:"Arizona", dlFormat:"L+digits:8", rev:"2023", expiryYears:12 },
-  { code:"AR", name:"Arkansas", dlFormat:"9+digits:8", rev:"2016", expiryYears:8 },
-  { code:"CA", name:"California", dlFormat:"L+digits:7", rev:"2024", tag:"new", expiryYears:5 },
-  { code:"CO", name:"Colorado", dlFormat:"digits:9", rev:"2022", expiryYears:5 },
-  { code:"CT", name:"Connecticut", dlFormat:"digits:9", rev:"2017", expiryYears:6 },
-  { code:"DE", name:"Delaware", dlFormat:"digits:7", rev:"2018", expiryYears:8 },
-  { code:"DC", name:"D.C.", dlFormat:"digits:7", rev:"2017", expiryYears:8 },
-  { code:"FL", name:"Florida", dlFormat:"L+digits:12", rev:"2017", expiryYears:8 },
-  { code:"GA", name:"Georgia", dlFormat:"digits:9", rev:"2019", expiryYears:8 },
-  { code:"HI", name:"Hawaii", dlFormat:"L+digits:8", rev:"2013", expiryYears:8 },
-  { code:"ID", name:"Idaho", dlFormat:"LL+digits:6", rev:"2023", expiryYears:8 },
-  { code:"IL", name:"Illinois", dlFormat:"L+digits:11", rev:"2016", expiryYears:4 },
-  { code:"IN", name:"Indiana", dlFormat:"indiana_hyphen", rev:"2017", expiryYears:6 },
-  { code:"IA", name:"Iowa", dlFormat:"3d+2L+4d", rev:"2017", expiryYears:8 },
-  { code:"KS", name:"Kansas", dlFormat:"ks_hyphen", rev:"2012", expiryYears:6 },
-  { code:"KY", name:"Kentucky", dlFormat:"L+digits:8", rev:"2018", expiryYears:4 },
-  { code:"LA", name:"Louisiana", dlFormat:"digits:9", rev:"2016", expiryYears:6 },
-  { code:"ME", name:"Maine", dlFormat:"digits:7", rev:"2016", expiryYears:6 },
-  { code:"MD", name:"Maryland", dlFormat:"md_hyphen", rev:"2021", expiryYears:8 },
-  { code:"MA", name:"Massachusetts", dlFormat:"S+digits:8", rev:"2018", expiryYears:5 },
-  { code:"MI", name:"Michigan", dlFormat:"mi_spaced", rev:"2024", expiryYears:4 },
-  { code:"MN", name:"Minnesota", dlFormat:"L+digits:12", rev:"2017", expiryYears:4 },
-  { code:"MS", name:"Mississippi", dlFormat:"digits:9", rev:"2023", expiryYears:8 },
-  { code:"MO", name:"Missouri", dlFormat:"L+digits:9", rev:"2020", expiryYears:6 },
-  { code:"MT", name:"Montana", dlFormat:"digits:9", rev:"2016", expiryYears:8 },
-  { code:"NE", name:"Nebraska", dlFormat:"L+digits:8", rev:"2021", expiryYears:5 },
-  { code:"NV", name:"Nevada", dlFormat:"digits:10", rev:"2021", expiryYears:8 },
-  { code:"NH", name:"New Hampshire", dlFormat:"NHL+digits:8", rev:"2024", expiryYears:5 },
-  { code:"NJ", name:"New Jersey", dlFormat:"L+digits:14", rev:"2020", expiryYears:4 },
-  { code:"NM", name:"New Mexico", dlFormat:"digits:9", rev:"2016", expiryYears:8 },
-  { code:"NY", name:"New York", dlFormat:"digits:9", rev:"2022", expiryYears:8 },
-  { code:"NC", name:"N. Carolina", dlFormat:"digits:12", rev:"2017", expiryYears:8 },
-  { code:"ND", name:"N. Dakota", dlFormat:"LLL+digits:6", rev:"2023", expiryYears:6 },
-  { code:"OH", name:"Ohio", dlFormat:"LL+digits:6", rev:"2018", expiryYears:4 },
-  { code:"OK", name:"Oklahoma", dlFormat:"L+digits:9", rev:"2017", expiryYears:4 },
-  { code:"OR", name:"Oregon", dlFormat:"digits:7", rev:"2018", expiryYears:8 },
-  { code:"PA", name:"Pennsylvania", dlFormat:"digits:8", rev:"2022", expiryYears:4 },
-  { code:"RI", name:"Rhode Island", dlFormat:"digits:7", rev:"2022", expiryYears:5 },
-  { code:"SC", name:"S. Carolina", dlFormat:"digits:9", rev:"2018", expiryYears:8 },
-  { code:"SD", name:"S. Dakota", dlFormat:"digits:8", rev:"2016", expiryYears:5 },
-  { code:"TN", name:"Tennessee", dlFormat:"digits:9", rev:"2018", expiryYears:5 },
-  { code:"TX", name:"Texas", dlFormat:"digits:8", rev:"2020", expiryYears:6 },
-  { code:"UT", name:"Utah", dlFormat:"digits:9", rev:"2018", expiryYears:8 },
-  { code:"VT", name:"Vermont", dlFormat:"digits:8", rev:"2017", expiryYears:8 },
-  { code:"VA", name:"Virginia", dlFormat:"L+digits:8", rev:"2018", expiryYears:8 },
-  { code:"WA", name:"Washington", dlFormat:"wa_wdl", rev:"2021", tag:"new", expiryYears:6 },
-  { code:"WV", name:"W. Virginia", dlFormat:"L+digits:6", rev:"2016", expiryYears:5 },
-  { code:"WI", name:"Wisconsin", dlFormat:"L+digits:13", rev:"2017", expiryYears:8 },
-  { code:"WY", name:"Wyoming", dlFormat:"wy_hyphen", rev:"2017", expiryYears:4 },
-];
+  /* Accent — brand tokens */
+  --accent-primary: #3b82f6;
+  --accent-primary-hover: #60a5fa;
+  --accent-secondary: #06b6d4;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-error: #ef4444;
+  --accent-info: #6366f1;
 
-// ─── Per-state form fields ──────────────────────────────────────
-const FIELD_DEFS = {
-  DCS: { label:"Last Name", type:"text", placeholder:"DOE", required:true, section:"personal", autoGen:true },
-  DAC: { label:"First Name", type:"text", placeholder:"JOHN", required:true, section:"personal", autoGen:true },
-  DAD: { label:"Middle Name", type:"text", placeholder:"MICHAEL", required:false, section:"personal" },
-  DBC: { label:"Sex", type:"select", options:[["1","Male"],["2","Female"],["9","Non-Binary"]], required:true, section:"personal" },
-  DBB: { label:"Date of Birth", type:"date", placeholder:"MM/DD/YYYY", required:true, section:"personal", autoGen:true },
-  DAU: { label:"Height (in)", type:"text", placeholder:"510", required:true, section:"physical", autoGen:true },
-  DAW: { label:"Weight (lbs)", type:"number", placeholder:"180", required:false, section:"physical" },
-  DAY: { label:"Eye Color", type:"select", options:[["BLK","Black"],["BLU","Blue"],["BRO","Brown"],["GRY","Gray"],["GRN","Green"],["HAZ","Hazel"],["MAR","Maroon"],["PNK","Pink"],["DIC","Dichromatic"],["UNK","Unknown"]], required:true, section:"physical" },
-  DAZ: { label:"Hair Color", type:"select", options:[["BAL","Bald"],["BLK","Black"],["BLN","Blond"],["BRO","Brown"],["GRY","Gray"],["RED","Red"],["SDY","Sandy"],["WHI","White"],["UNK","Unknown"]], required:false, section:"physical" },
-  DAG: { label:"Street Address", type:"text", placeholder:"123 MAIN ST", required:true, section:"address", autoGen:true },
-  DAH: { label:"Address Line 2", type:"text", placeholder:"APT 4B", required:false, section:"address" },
-  DAI: { label:"City", type:"text", placeholder:"HOUSTON", required:true, section:"address", autoGen:true },
-  DAK: { label:"ZIP Code", type:"text", placeholder:"770010000", required:true, section:"address", autoGen:true },
-  DCA: { label:"DL Class", type:"text", placeholder:"D", required:true, section:"document" },
-  DCB: { label:"Restrictions", type:"text", placeholder:"NONE", required:false, section:"document" },
-  DCD: { label:"Endorsements", type:"text", placeholder:"NONE", required:false, section:"document" },
-  DDK: { label:"Organ Donor", type:"select", options:[["0","No"],["1","Yes"]], required:false, section:"physical" },
-  DCU: { label:"Name Suffix", type:"text", placeholder:"JR, SR, III", required:false, section:"personal" },
-  DCE: { label:"Weight Range", type:"select", options:[["0","≤70"],["1","71-100"],["2","101-130"],["3","131-160"],["4","161-190"],["5","191-220"],["6","221-250"],["7","251-280"],["8","281-320"],["9","321+"]], required:false, section:"physical" },
-  DCL: { label:"Race/Ethnicity", type:"select", options:[["W","White"],["B","Black"],["H","Hispanic"],["A","Asian"],["I","Native American"],["U","Unknown"]], required:false, section:"physical" },
-};
+  /* Elevation shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.5);
+  --shadow-glow: 0 0 20px rgba(59,130,246,.15);
 
-const DEFAULT_MANDATORY = ["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"];
-const DEFAULT_OPTIONAL  = ["DAD","DAW","DAZ","DCB","DCD"];
+  /* Border */
+  --border-subtle: rgba(148,163,184,.12);
+  --border-default: rgba(148,163,184,.2);
+  --border-focus: var(--accent-primary);
+  --border-error: var(--accent-error);
 
-// Per-state field configs — ALL 51 states from TG.py STATE_FIELD_REQS
-const STATE_FIELDS = {
-  TX: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCL","DDK","DCB","DCD"] },
-  FL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAW","DAZ","DCB","DCD"] },
-  AR: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
-  CO: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCL","DCU","DCB","DCD"] },
-  IA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  IN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
-  PA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  NV: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAW","DAZ","DCE","DCU","DCB","DCD"] },
-  DC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
-  SC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DCL","DDK","DCB","DCD"] },
-  WA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DDK","DCB","DCD"] },
-  CA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  IL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
-  OH: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCE","DCU","DDK","DCB","DCD"] },
-  NC: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCL","DDK","DCB","DCD"] },
-  NE: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DAZ","DCE","DCL","DCB","DCD"] },
-  MO: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAW","DCU","DDK","DCB","DCD"] },
-  MA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
-  NH: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
-  WY: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
-  MI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DCB","DCD"] },
-  MD: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  AK: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  GA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
-  MS: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
-  NJ: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  UT: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  VA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  KS: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
-  MN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  WI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  TN: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCU","DCB","DCD"] },
-  OR: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  OK: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  WV: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAH","DAZ","DCB","DCD"] },
-  AZ: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DDK","DCB","DCD"] },
-  RI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAZ","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  SD: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  VT: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  NY: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DCB","DCD"] },
-  AL: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  CT: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  DE: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  HI: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  ID: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  KY: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  LA: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  ME: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  MT: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  NM: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-  ND: { mandatory:["DCS","DAC","DBC","DBB","DAU","DAW","DAY","DAG","DAI","DAK","DCA"], optional:["DAD","DAZ","DCB","DCD"] },
-};
+  /* Spacing — 4/8dp grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
 
-// ─── DL Number Generator (mirrors DocEngine.gen_dl) ─────────────
-function generateDLN(state, lastName) {
-  const fmt = state.dlFormat;
-  const ln = (lastName || 'DOE').toUpperCase();
-  const first = ln[0] || 'A';
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
 
-  if (fmt === 'digits:7') return randDigits(7);
-  if (fmt === 'digits:8') return randDigits(8);
-  if (fmt === 'digits:9') return randDigits(9);
-  if (fmt === 'digits:10') return randDigits(10);
-  if (fmt === 'digits:12') return randDigits(12);
-  if (fmt === '9+digits:8') return '9' + randDigits(8);
-  if (fmt === 'L+digits:6') return first + randDigits(6);
-  if (fmt === 'L+digits:7') return first + randDigits(7);
-  if (fmt === 'L+digits:8') return first + randDigits(8);
-  if (fmt === 'L+digits:9') return first + randDigits(9);
-  if (fmt === 'L+digits:11') return first + randDigits(11);
-  if (fmt === 'L+digits:12') return first + randDigits(12);
-  if (fmt === 'L+digits:13') return first + randDigits(13);
-  if (fmt === 'L+digits:14') return first + randDigits(14);
-  if (fmt === 'LL+digits:6') return randLetters(2) + randDigits(6);
-  if (fmt === 'S+digits:8') return 'S' + randDigits(8);
-  if (fmt === 'NHL+digits:8') return 'NHL' + randDigits(8);
-  if (fmt === 'LLL+digits:6') return randLetters(3) + randDigits(6);
-  if (fmt === '3d+2L+4d') return randDigits(3) + randLetters(2) + randDigits(4);
-  if (fmt === 'indiana_hyphen') return `${randDigits(4)}-${randDigits(2)}-${randDigits(4)}`;
-  if (fmt === 'ks_hyphen') return `K${randDigits(2)}-${randDigits(2)}-${randDigits(4)}`;
-  if (fmt === 'md_hyphen') return `${first}-${randDigits(3)}-${randDigits(3)}-${randDigits(3)}-${randDigits(3)}`;
-  if (fmt === 'wy_hyphen') return `${randDigits(6)}-${randDigits(3)}`;
-  if (fmt === 'mi_spaced') return `${first} ${randDigits(3)} ${randDigits(3)} ${randDigits(3)} ${randDigits(3)}`;
-  if (fmt === 'wa_wdl') return ('WDL' + randLetter() + randDigits(8)).substring(0, 12);
-  return randDigits(8);
+  /* Typography scale — base 16px */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.8125rem;  /* 13px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+
+  /* Font weights — hierarchy */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Animation tokens — Emil Kowalski design engineering curves */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);      /* Strong ease-out for UI interactions */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);  /* Strong ease-in-out for movement */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* Spring-like bounce */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);    /* iOS-like drawer curve */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+
+  /* Z-index scale */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-overlay: 20;
+  --z-modal: 40;
+  --z-toast: 100;
+
+  /* Telegram overrides */
+  --tg-viewport-height: 100vh;
 }
 
-// ─── ICN Generator (mirrors DocEngine.gen_icn per state) ────────
-function generateICN(state) {
-  const code = state.code;
-  switch(code) {
-    case 'TX': return randDigits(11);
-    case 'FL': return '0100' + randDigits(12);
-    case 'AR': return '02101' + randDigits(11);
-    case 'IN': return '0370' + randDigits(12);
-    case 'PA': return '0250' + randDigits(12);
-    case 'MD': return '100' + randDigits(7);
-    case 'AK': return '1000' + randDigits(6);
-    case 'GA': return randDigits(16);
-    case 'MS': return '0510' + randDigits(12);
-    case 'NV': return '001' + randDigits(10);
-    case 'NJ': return randLetters(4) + randDigits(14);
-    case 'VA': return '0060' + randDigits(12);
-    case 'WI': return '0130' + randDigits(12);
-    case 'NE': return '0540' + randDigits(12);
-    case 'SD': return '0420' + randDigits(12);
-    case 'NH': return randDigits(8);
-    // ── 11 AAMVA-standard states ──
-    case 'AL': return '0330' + randDigits(12);
-    case 'CT': return '0060' + randDigits(12);
-    case 'DE': return '0110' + randDigits(12);
-    case 'HI': return '0470' + randDigits(8);
-    case 'ID': return '0500' + randDigits(12);
-    case 'KY': return '0460' + randDigits(12);
-    case 'LA': return '0070' + randDigits(12);
-    case 'ME': return '0410' + randDigits(12);
-    case 'MT': return '0080' + randDigits(12);
-    case 'NM': return '0090' + randDigits(12);
-    case 'ND': return '0340' + randDigits(12);
-    default:   return code + randDigits(11);
+/* ─── 1b. Global SVG Icon Rendering ───────────────────────────── */
+/* Fix: SVG <symbol> shapes default to fill:black in SVG spec.
+   <use> creates a shadow tree that won't inherit CSS on parent.
+   These rules target the SVG element wrapping <use> in all contexts. */
+svg use {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ─── 2. Reset & Base ──────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--surface-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ─── 3. App Shell ─────────────────────────────────────────────── */
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ─── 4. View System ───────────────────────────────────────────── */
+.view {
+  display: none;
+  padding: var(--space-4);
+  padding-bottom: var(--space-16);
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.view.active {
+  display: block;
+  animation: viewEnter var(--duration-slow) var(--ease-out) forwards;
+}
+
+@keyframes viewEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view.active {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
-// ─── Auto-Generate Field Values ─────────────────────────────────
-function autoGenField(key, stateCode) {
-  const s = STATES.find(x => x.code === stateCode);
-  if (key === 'DCS') return FAKE_LAST_NAMES[Math.floor(Math.random() * FAKE_LAST_NAMES.length)];
-  if (key === 'DAC') {
-    const sex = document.getElementById('field-DBC')?.value || '1';
-    const list = sex === '2' ? FAKE_FIRST_NAMES_F : FAKE_FIRST_NAMES_M;
-    return list[Math.floor(Math.random() * list.length)];
-  }
-  if (key === 'DBB') {
-    const y = 1970 + Math.floor(Math.random() * 35);
-    const m = 1 + Math.floor(Math.random() * 12);
-    const d = 1 + Math.floor(Math.random() * 28);
-    return `${padDate(m)}/${padDate(d)}/${y}`;
-  }
-  if (key === 'DAU') {
-    // Height in format: 3-digit inches-based (e.g., 510 = 5'10")
-    const feet = 5 + Math.floor(Math.random() * 2);
-    const inches = Math.floor(Math.random() * 12);
-    return `${feet}${padDate(inches)}`;
-  }
-  if (key === 'DAG') {
-    const num = 100 + Math.floor(Math.random() * 9900);
-    const st = FAKE_STREETS[Math.floor(Math.random() * FAKE_STREETS.length)];
-    return `${num} ${st}`;
-  }
-  if (key === 'DAI') {
-    const cities = FAKE_CITIES[stateCode] || ['SPRINGFIELD'];
-    return cities[Math.floor(Math.random() * cities.length)];
-  }
-  if (key === 'DAK') {
-    const ZIP_PREFIXES = {
-      TX:['750','770','762'],FL:['330','336','321'],CA:['900','913','945'],
-      NY:['100','112','113'],IL:['600','606','627'],PA:['190','191','194'],
-      OH:['432','440','453'],MI:['482','483','484'],GA:['300','310','312'],
-      NC:['270','275','279'],NJ:['070','071','082'],VA:['220','221','201'],
-      WA:['980','981','986'],AZ:['850','852','857'],MA:['021','020','027'],
-      TN:['370','371','372'],IN:['460','461','462'],MO:['641','652','658'],
-      MD:['212','211','210'],WI:['530','531','535'],CO:['800','801','802'],
-      MN:['550','551','553'],SC:['290','291','292'],AL:['350','360','356'],
-      LA:['700','701','710'],KY:['400','410','420'],OR:['970','971','972'],
-      OK:['740','731','730'],CT:['060','061','062'],UT:['840','841','846'],
-      IA:['520','521','503'],NV:['891','890','895'],AR:['716','722','720'],
-      MS:['390','391','387'],KS:['662','660','672'],NE:['680','681','689'],
-      NM:['870','871','873'],WV:['253','254','255'],ID:['832','833','836'],
-      HI:['967','968'],ME:['039','040','041'],NH:['030','031','038'],
-      RI:['028','029'],MT:['590','591','592'],DE:['197','198','199'],
-      SD:['571','572','575'],ND:['580','581','582'],AK:['995','996','997'],
-      DC:['200','201','202'],VT:['050','051','054'],WY:['820','821','825']
-    };
-    const prefixes = ZIP_PREFIXES[stateCode] || ['000'];
-    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    if (stateCode === 'HI') return prefix + randDigits(2);
-    return prefix + randDigits(6);
-  }
-  return '';
+/* ─── 5. App Header ────────────────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-6);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--surface-base);
 }
 
-// ─── App State ──────────────────────────────────────────────────
-let currentView = 'dashboard';
-let selectedState = null;
-let formMode = 'semi_auto';
-let tg = null;
-let generatedDLN = '';
-let generatedICN = '';
-let generatedDD = '';
-let generatedIssue = '';
-let generatedExpiry = '';
-
-// ─── Telegram SDK Init ──────────────────────────────────────────
-function initTelegram() {
-  if (window.Telegram && window.Telegram.WebApp) {
-    tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
-    tg.enableClosingConfirmation();
-    document.documentElement.style.setProperty('--tg-bg', tg.themeParams.bg_color || '#0a0e14');
-    document.documentElement.style.setProperty('--tg-text', tg.themeParams.text_color || '#f0f4f8');
-  } else {
-    console.log('[TMA] Running outside Telegram — mock mode');
-  }
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
-// ─── View Navigation ────────────────────────────────────────────
-function showView(viewId) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  const target = document.getElementById(viewId);
-  if (target) {
-    target.classList.add('active');
-    currentView = viewId;
-  }
-  if (tg) {
-    if (viewId === 'dashboard') { tg.BackButton.hide(); tg.MainButton.hide(); }
-    else if (viewId === 'states-view') { tg.BackButton.show(); tg.MainButton.hide(); }
-    else if (viewId === 'form-view') {
-      tg.BackButton.show();
-      tg.MainButton.setText('Generate Barcode');
-      tg.MainButton.show();
-      tg.MainButton.color = '#3b82f6';
-    }
-  }
-  if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+.app-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-// ─── Dashboard ──────────────────────────────────────────────────
-function renderDashboard() {
-  const user = tg?.initDataUnsafe?.user;
-  const el = document.getElementById('welcome-name');
-  if (el) el.textContent = user?.first_name || 'User';
-  const statEl = document.getElementById('stat-states');
-  if (statEl) statEl.textContent = STATES.length;
-
-  // Parse user stats from URL hash (passed by TG.py)
-  // Format: #credits=525.0&today=1&limit=50&tier=premium&total=13
-  const hash = window.location.hash.substring(1);
-  if (hash) {
-    const params = new URLSearchParams(hash);
-    const credits = params.get('credits');
-    const today = params.get('today');
-    const limit = params.get('limit');
-    const tier = params.get('tier');
-    const total = params.get('total');
-
-    if (credits !== null) {
-      const credEl = document.getElementById('stat-credits');
-      if (credEl) credEl.textContent = parseFloat(credits).toFixed(1);
-      const meterCredits = document.getElementById('meter-credits');
-      if (meterCredits) {
-        const pct = Math.min(100, (parseFloat(credits) / 10) * 100);
-        meterCredits.style.width = `${pct}%`;
-      }
-    }
-
-    if (today !== null && limit !== null) {
-      const genEl = document.getElementById('stat-gens');
-      if (genEl) genEl.textContent = `${today}/${limit}`;
-      const meterGens = document.getElementById('meter-gens');
-      if (meterGens) {
-        const pct = Math.min(100, (parseInt(today) / Math.max(parseInt(limit), 1)) * 100);
-        meterGens.style.width = `${pct}%`;
-      }
-    }
-
-    if (tier !== null) {
-      const tierEl = document.getElementById('stat-tier');
-      if (tierEl) tierEl.textContent = tier === 'premium' ? 'Premium' : 'Free';
-      const meterTier = document.getElementById('meter-tier');
-      if (meterTier) meterTier.style.width = tier === 'premium' ? '100%' : '33%';
-    }
-  }
-
-  // Update version display
-  const verEl = document.getElementById('app-version');
-  if (verEl) verEl.textContent = 'v18.1';
+.app-logo svg {
+  width: 20px;
+  height: 20px;
+  stroke: white;
+  stroke-width: 2;
+  fill: none;
 }
 
-// ─── State Grid ─────────────────────────────────────────────────
-function renderStateGrid(filter = '') {
-  const grid = document.getElementById('state-grid');
-  if (!grid) return;
-
-  const filtered = STATES.filter(s =>
-    s.name.toLowerCase().includes(filter.toLowerCase()) ||
-    s.code.toLowerCase().includes(filter.toLowerCase())
-  );
-
-  grid.innerHTML = filtered.map(s => `
-    <div class="state-card ${s.tag ? 'new-tag' : ''}" data-code="${s.code}"
-         onclick="selectState('${s.code}')" role="button" tabindex="0"
-         aria-label="${s.name}">
-      <span class="state-code">${s.code}</span>
-      <span class="state-name">${s.name}</span>
-      <span class="state-status active"></span>
-    </div>
-  `).join('');
-
-  const countEl = document.getElementById('state-count');
-  if (countEl) countEl.textContent = filtered.length;
+.app-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
-function selectState(code) {
-  selectedState = STATES.find(s => s.code === code);
-  if (!selectedState) return;
-  if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-  generatedDLN = '';
-  generatedICN = '';
-  generatedDD = '';
-  generatedIssue = '';
-  generatedExpiry = '';
-  renderForm(code);
-  showView('form-view');
+.app-subtitle {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-// ─── Form Rendering (PER-STATE DISTINCT FORMS) ──────────────────
-function renderForm(stateCode) {
-  const state = STATES.find(s => s.code === stateCode);
-  if (!state) return;
-
-  // Header
-  const badge = document.getElementById('form-badge');
-  const title = document.getElementById('form-title');
-  const subtitle = document.getElementById('form-subtitle');
-  if (badge) badge.textContent = stateCode;
-  if (title) title.textContent = state.name;
-  if (subtitle) subtitle.textContent = `AAMVA Rev. ${state.rev} · DL: ${describeDLFormat(state.dlFormat)}`;
-
-  // Get state-specific field config
-  const config = STATE_FIELDS[stateCode] || { mandatory: DEFAULT_MANDATORY, optional: DEFAULT_OPTIONAL };
-
-  // Build sections
-  const sections = { personal:[], physical:[], address:[], document:[] };
-  const sectionIcons = {
-    personal: '<svg width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-user"/></svg>',
-    physical: '<svg width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-ruler"/></svg>',
-    address:  '<svg width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-map"/></svg>',
-    document: '<svg width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-file"/></svg>',
-  };
-  const sectionLabels = {
-    personal: 'Personal Information',
-    physical: 'Physical Description',
-    address:  'Address',
-    document: 'Document Details'
-  };
-  // State-specific defaults from TG.py StateProfile
-  // default_class='D' in TG.py unless overridden, default_restrict='NONE'
-  const STATE_DEFAULTS = {
-    TX: { DCA:'C' },     // default_class="C"
-    FL: { DCA:'E', DCB:'A' },  // default_class="E", default_restrict="A"
-    CA: { DCA:'C' },     // default_class="C"
-    PA: { DCA:'C' },     // default_class="C"
-    AR: { DCA:'D' },     // explicit default_class="D"
-  };
-  const stDefaults = STATE_DEFAULTS[stateCode] || {};
-  // Date format for OR/WY (CCYYMMDD) — inform the user
-  const dateYYYYfirst = (stateCode === 'OR' || stateCode === 'WY');
-
-  config.mandatory.forEach(key => {
-    const def = { ...FIELD_DEFS[key] };
-    if (!def.label) return;
-    if (stDefaults[key]) def.placeholder = stDefaults[key];
-    if (dateYYYYfirst && key === 'DBB') def.placeholder = 'YYYY/MM/DD';
-    sections[def.section].push({ key, ...def, required: true });
-  });
-  config.optional.forEach(key => {
-    const def = { ...FIELD_DEFS[key] };
-    if (!def.label) return;
-    if (stDefaults[key]) def.placeholder = stDefaults[key];
-    sections[def.section].push({ key, ...def, required: false });
-  });
-
-  const container = document.getElementById('form-fields');
-  if (!container) return;
-
-  let html = '';
-
-  // ── ID Display Boxes (DLN, INC, DD, Issue, Expiry) ──
-  const today = new Date();
-  const todayStr = `${padDate(today.getMonth()+1)}/${padDate(today.getDate())}/${today.getFullYear()}`;
-  const expiryYrs = state.expiryYears || 8;
-  let expiryDt;
-  if (state.code === 'AZ') {
-    // Arizona: default expiry hint is +65 years from a sample DOB
-    expiryDt = new Date(today.getFullYear() + 12, today.getMonth(), today.getDate());
-  } else {
-    expiryDt = new Date(today.getFullYear() + expiryYrs, today.getMonth(), today.getDate());
-  }
-  const expiryStr = `${padDate(expiryDt.getMonth()+1)}/${padDate(expiryDt.getDate())}/${expiryDt.getFullYear()}`;
-
-  html += `
-    <div class="id-boxes-grid">
-      <div class="id-box">
-        <div class="id-box-header">
-          <span class="id-box-label">DL Number</span>
-          <button class="auto-gen-btn" onclick="autoGenDLN()" aria-label="Auto-generate DL number">
-            <svg width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
-            Generate
-          </button>
-        </div>
-        <input type="text" class="id-box-value" id="dln-display"
-               placeholder="Click Generate or type manually"
-               oninput="onIdBoxEdit('dln',this.value)" />
-        <div class="id-box-format">Format: ${describeDLFormat(state.dlFormat)}</div>
-      </div>
-      <div class="id-box">
-        <div class="id-box-header">
-          <span class="id-box-label">Inventory Control</span>
-          <button class="auto-gen-btn" onclick="autoGenINC()" aria-label="Auto-generate ICN">
-            <svg width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
-            Generate
-          </button>
-        </div>
-        <input type="text" class="id-box-value" id="icn-display"
-               placeholder="Click Generate or type manually"
-               oninput="onIdBoxEdit('icn',this.value)" />
-        <div class="id-box-format">10-digit control number</div>
-      </div>
-      <div class="id-box">
-        <div class="id-box-header">
-          <span class="id-box-label">Doc Discriminator</span>
-          <button class="auto-gen-btn" onclick="autoGenDD()" aria-label="Auto-generate doc discriminator">
-            <svg width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
-            Generate
-          </button>
-        </div>
-        <input type="text" class="id-box-value" id="dd-display"
-               placeholder="Click Generate or type manually"
-               oninput="onIdBoxEdit('dd',this.value)" />
-        <div class="id-box-format">Unique document identifier</div>
-      </div>
-      <div class="id-box">
-        <div class="id-box-header">
-          <span class="id-box-label">Issue Date</span>
-          <button class="auto-gen-btn" onclick="autoGenIssue()" aria-label="Auto-generate issue date">
-            <svg width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
-            Generate
-          </button>
-        </div>
-        <input type="text" class="id-box-value" id="issue-display"
-               placeholder="MM/DD/YYYY or Generate"
-               oninput="onIdBoxEdit('issue',this.value)" />
-        <div class="id-box-format">Default: today (${todayStr})</div>
-      </div>
-      <div class="id-box id-box-full">
-        <div class="id-box-header">
-          <span class="id-box-label">Expiry Date</span>
-          <button class="auto-gen-btn" onclick="autoGenExpiry()" aria-label="Auto-generate expiry date">
-            <svg width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><use href="#icon-zap"/></svg>
-            Generate
-          </button>
-        </div>
-        <input type="text" class="id-box-value" id="expiry-display"
-               placeholder="MM/DD/YYYY or Generate"
-               oninput="onIdBoxEdit('expiry',this.value)" />
-        <div class="id-box-format">Default: +${expiryYrs} years (${expiryStr})</div>
-      </div>
-    </div>`;
-
-  // ── Form Sections ──
-  for (const [sectionKey, fields] of Object.entries(sections)) {
-    if (fields.length === 0) continue;
-    html += `<div class="form-section">
-      <div class="form-section-title">${sectionIcons[sectionKey]} ${sectionLabels[sectionKey]}</div>
-      <div class="form-row">`;
-
-    fields.forEach((f, i) => {
-      if (i > 0 && i % 2 === 0) html += `</div><div class="form-row">`;
-
-      const hasAutoGen = f.autoGen && (f.type === 'text' || f.type === 'date' || f.type === 'number');
-      html += `<div class="form-group">
-        <div class="form-label-row">
-          <label class="form-label" for="field-${f.key}">${f.label} ${f.required ? '<span class="required">*</span>' : ''}</label>
-          ${hasAutoGen ? `<button class="auto-gen-mini" onclick="autoFillField('${f.key}')" aria-label="Auto-generate ${f.label}" title="Auto-generate">
-            <svg width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><use href="#icon-zap"/></svg>
-          </button>` : ''}
-        </div>`;
-
-      if (f.type === 'select' && f.options) {
-        html += `<select class="form-select" id="field-${f.key}" data-field="${f.key}" ${f.required ? 'required' : ''}>
-          <option value="">Select...</option>
-          ${f.options.map(([val, text]) => `<option value="${val}">${text}</option>`).join('')}
-        </select>`;
-      } else if (f.type === 'date') {
-        html += `<input class="form-input" type="text" id="field-${f.key}" data-field="${f.key}"
-          placeholder="${f.placeholder || ''}" ${f.required ? 'required' : ''} inputmode="numeric">`;
-      } else if (f.type === 'number') {
-        html += `<input class="form-input" type="number" id="field-${f.key}" data-field="${f.key}"
-          placeholder="${f.placeholder || ''}" ${f.required ? 'required' : ''} inputmode="numeric">`;
-      } else {
-        html += `<input class="form-input" type="text" id="field-${f.key}" data-field="${f.key}"
-          placeholder="${f.placeholder || ''}" ${f.required ? 'required' : ''} autocapitalize="characters">`;
-      }
-      html += `</div>`;
-    });
-    html += `</div></div>`;
-  }
-
-  // ── Auto-Generated IDs (summary) ──
-  html += `
-    <div class="auto-ids-card">
-      <div class="auto-ids-header"><svg><use href="#icon-zap"/></svg> Auto-Generated Summary</div>
-      <div class="auto-id-row">
-        <span class="auto-id-label">DL Number</span>
-        <span class="auto-id-value" id="preview-daq">${generatedDLN || 'Pending'}</span>
-      </div>
-      <div class="auto-id-row">
-        <span class="auto-id-label">Doc Discriminator</span>
-        <span class="auto-id-value" id="preview-dcf">${generatedDD || 'Pending'}</span>
-      </div>
-      <div class="auto-id-row">
-        <span class="auto-id-label">Inventory Control</span>
-        <span class="auto-id-value" id="preview-dck">${generatedICN || 'Pending'}</span>
-      </div>
-      <div class="auto-id-row">
-        <span class="auto-id-label">Issue Date</span>
-        <span class="auto-id-value" id="preview-dbd">${generatedIssue || 'Pending'}</span>
-      </div>
-      <div class="auto-id-row">
-        <span class="auto-id-label">Expiry Date</span>
-        <span class="auto-id-value" id="preview-dba">${generatedExpiry || 'Pending'}</span>
-      </div>
-    </div>`;
-
-  container.innerHTML = html;
-  updateFormProgress();
+.header-pill {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--accent-primary);
+  background: rgba(59,130,246,.12);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
 }
 
-// ─── DL Format Descriptor ───────────────────────────────────────
-function describeDLFormat(fmt) {
-  const map = {
-    'digits:7': '7 digits', 'digits:8': '8 digits', 'digits:9': '9 digits',
-    'digits:10': '10 digits', 'digits:12': '12 digits',
-    'L+digits:6': 'Letter + 6 digits', 'L+digits:7': 'Letter + 7 digits',
-    'L+digits:8': 'Letter + 8 digits', 'L+digits:9': 'Letter + 9 digits',
-    'L+digits:11': 'Letter + 11 digits', 'L+digits:12': 'Letter + 12 digits',
-    'L+digits:13': 'Letter + 13 digits', 'L+digits:14': 'Letter + 14 digits',
-    'LL+digits:6': '2 Letters + 6 digits', 'LLL+digits:6': '3 Letters + 6 digits',
-    'S+digits:8': 'S + 8 digits',
-    'NHL+digits:8': 'NHL + 8 digits', '3d+2L+4d': '3dig + 2let + 4dig',
-    'indiana_hyphen': 'XXXX-XX-XXXX', 'ks_hyphen': 'KXX-XX-XXXX',
-    'md_hyphen': 'X-XXX-XXX-XXX-XXX', 'wy_hyphen': 'XXXXXX-XXX',
-    'mi_spaced': 'X XXX XXX XXX XXX', 'wa_wdl': 'WDLXXXXXXXXX',
-    '9+digits:8': '9 + 8 digits',
-  };
-  return map[fmt] || fmt;
+/* ─── 6. Welcome Section ───────────────────────────────────────── */
+.welcome-section {
+  margin-bottom: var(--space-8);
 }
 
-// ─── Auto-Generate DLN ─────────────────────────────────────────
-function autoGenDLN() {
-  if (!selectedState) return;
-  const lastNameEl = document.getElementById('field-DCS');
-  const lastName = lastNameEl?.value || 'DOE';
-  generatedDLN = generateDLN(selectedState, lastName);
-
-  const display = document.getElementById('dln-display');
-  if (display) {
-    display.value = generatedDLN;
-    display.classList.add('flash');
-    setTimeout(() => display.classList.remove('flash'), 300);
-  }
-
-  const preview = document.getElementById('preview-daq');
-  if (preview) preview.textContent = generatedDLN;
-
-  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-  showToast('DL Number generated', 'success');
+.welcome-greeting {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--space-1);
+  letter-spacing: -0.02em;
 }
 
-// ─── Auto-Generate INC ─────────────────────────────────────────
-function autoGenINC() {
-  if (!selectedState) return;
-  generatedICN = generateICN(selectedState);
-
-  const display = document.getElementById('icn-display');
-  if (display) {
-    display.value = generatedICN;
-    display.classList.add('flash');
-    setTimeout(() => display.classList.remove('flash'), 300);
-  }
-
-  const preview = document.getElementById('preview-dck');
-  if (preview) preview.textContent = generatedICN;
-
-  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-  showToast('ICN generated', 'success');
+.welcome-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
-// ─── Doc Discriminator Generator (mirrors DocEngine.gen_dd) ─────
-function generateDD(state) {
-  const dl = generatedDLN || randDigits(8);
-  const iss = new Date();
-  const yy = String(iss.getFullYear()).slice(-2);
-  const mm = padDate(iss.getMonth()+1);
-  const dd = padDate(iss.getDate());
-  const code = state.code;
+/* ─── 7. Stats Grid ────────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
 
-  switch(code) {
-    case 'TX': return randDigits(12) + ' ' + randDigits(8);
-    case 'FL': return randLetter() + randDigits(2) + yy + mm + dd + randDigits(4);
-    case 'AR': return randDigits(10) + ' ' + randDigits(2) + yy;
-    case 'CO': return randDigits(7);
-    case 'IN': return mm + dd + randDigits(10);
-    case 'PA': return randDigits(12) + ' ' + randDigits(13);
-    case 'MD': return randLetters(3) + randDigits(6);
-    case 'DC': return randDigits(8);
-    case 'GA': return randDigits(18);
-    case 'NV': return randDigits(12) + ' ' + randDigits(9);
-    case 'NJ': return 'CP' + iss.getFullYear() + randDigits(11);
-    case 'SC': return randDigits(19);
-    case 'UT': return randDigits(8);
-    case 'VA': return randDigits(9);
-    case 'MO': return yy + randDigits(10);
-    case 'NC': return randDigits(10);
-    case 'TN': return randDigits(16);
-    case 'NH': return randDigits(8);
-    case 'RI': return randDigits(7);
-    case 'WY': return randDigits(8);
-    case 'OR': return '';  // Oregon uses DAA instead
-    case 'MI': return '';  // Michigan: empty DD
-    case 'OK': return '';  // Oklahoma: empty DD
-    case 'MN': return String(Math.floor(Math.random() * 99999999)).padStart(14, '0');
-    // ── 11 AAMVA-standard states ──
-    case 'AL': return randDigits(12);
-    case 'CT': return randDigits(9);
-    case 'DE': return randDigits(10);
-    case 'HI': return randDigits(12);
-    case 'ID': return randDigits(10);
-    case 'KY': return randDigits(11);
-    case 'LA': return randDigits(12);
-    case 'ME': return randDigits(10);
-    case 'MT': return randDigits(14);
-    case 'NM': return randDigits(10);
-    case 'ND': return randDigits(12);
-    default: {
-      const issStr = `${iss.getFullYear()}${mm}${dd}`;
-      return (issStr + dl.replace(/[^A-Z0-9]/gi, '').substring(0, 4) + randDigits(6)).substring(0, 20);
-    }
+.stat-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  min-height: 44px;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.stat-card[data-accent="blue"]::before { background: var(--accent-primary); }
+.stat-card[data-accent="cyan"]::before { background: var(--accent-secondary); }
+.stat-card[data-accent="amber"]::before { background: var(--accent-warning); }
+.stat-card[data-accent="violet"]::before { background: var(--accent-info); }
+
+@media (hover: hover) and (pointer: fine) {
+  .stat-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-default);
   }
 }
 
-function autoGenDD() {
-  if (!selectedState) return;
-  generatedDD = generateDD(selectedState);
-
-  const display = document.getElementById('dd-display');
-  if (display) {
-    display.value = generatedDD;
-    display.classList.add('flash');
-    setTimeout(() => display.classList.remove('flash'), 300);
-  }
-
-  const preview = document.getElementById('preview-dcf');
-  if (preview) preview.textContent = generatedDD;
-
-  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-  showToast('Doc Discriminator generated', 'success');
+.stat-card:active {
+  transform: scale(0.97);
 }
 
-// ─── Auto-Generate Issue Date ───────────────────────────────────
-function autoGenIssue() {
-  if (!selectedState) return;
-  // Default: today, or random recent date within last 2 years
-  const now = new Date();
-  const daysBack = Math.floor(Math.random() * 60); // within last 60 days
-  const d = new Date(now.getTime() - daysBack * 86400000);
-  generatedIssue = `${padDate(d.getMonth()+1)}/${padDate(d.getDate())}/${d.getFullYear()}`;
-
-  const display = document.getElementById('issue-display');
-  if (display) {
-    display.value = generatedIssue;
-    display.classList.add('flash');
-    setTimeout(() => display.classList.remove('flash'), 300);
-  }
-
-  const preview = document.getElementById('preview-dbd');
-  if (preview) preview.textContent = generatedIssue;
-
-  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-  showToast('Issue Date generated', 'success');
+.stat-card .stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-3);
 }
 
-// ─── Auto-Generate Expiry Date ──────────────────────────────────
-function autoGenExpiry() {
-  if (!selectedState) return;
-  const base = generatedIssue ? parseSimpleDate(generatedIssue) : new Date();
-  let expiry;
+.stat-card[data-accent="blue"] .stat-icon { background: rgba(59,130,246,.15); color: var(--accent-primary); }
+.stat-card[data-accent="cyan"] .stat-icon { background: rgba(6,182,212,.15); color: var(--accent-secondary); }
+.stat-card[data-accent="amber"] .stat-icon { background: rgba(245,158,11,.15); color: var(--accent-warning); }
+.stat-card[data-accent="violet"] .stat-icon { background: rgba(99,102,241,.15); color: var(--accent-info); }
 
-  if (selectedState.code === 'AZ') {
-    // Arizona: expires at age 65 (calculated from DOB)
-    const dobEl = document.getElementById('field-DBB');
-    const dobVal = dobEl?.value?.trim();
-    if (dobVal) {
-      const dob = parseSimpleDate(dobVal);
-      expiry = new Date(dob.getFullYear() + 65, dob.getMonth(), dob.getDate());
-    } else {
-      // Fallback if no DOB entered yet
-      expiry = new Date(base.getFullYear() + 12, base.getMonth(), base.getDate());
-    }
-  } else {
-    const expiryYrs = selectedState?.expiryYears || 8;
-    expiry = new Date(base.getFullYear() + expiryYrs, base.getMonth(), base.getDate());
-  }
-
-  generatedExpiry = `${padDate(expiry.getMonth()+1)}/${padDate(expiry.getDate())}/${expiry.getFullYear()}`;
-
-  const display = document.getElementById('expiry-display');
-  if (display) {
-    display.value = generatedExpiry;
-    display.classList.add('flash');
-    setTimeout(() => display.classList.remove('flash'), 300);
-  }
-
-  const preview = document.getElementById('preview-dba');
-  if (preview) preview.textContent = generatedExpiry;
-
-  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-  showToast('Expiry Date generated', 'success');
+.stat-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
 }
 
-// ─── Parse simple MM/DD/YYYY date ───────────────────────────────
-function parseSimpleDate(str) {
-  const parts = str.split('/');
-  if (parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[0])-1, parseInt(parts[1]));
-  return new Date();
+.stat-value {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+  font-variant-numeric: tabular-nums;
 }
 
-// ─── Manual Edit Handler for ID Boxes ───────────────────────────
-function onIdBoxEdit(field, value) {
-  const val = value.trim();
+.stat-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 
-  // Sync manual input to the generated* variable
-  switch (field) {
-    case 'dln':
-      generatedDLN = val;
-      const pDln = document.getElementById('preview-daq');
-      if (pDln) pDln.textContent = val || 'Pending';
-      break;
-    case 'icn':
-      generatedICN = val;
-      const pIcn = document.getElementById('preview-dck');
-      if (pIcn) pIcn.textContent = val || 'Pending';
-      break;
-    case 'dd':
-      generatedDD = val;
-      const pDd = document.getElementById('preview-dcf');
-      if (pDd) pDd.textContent = val || 'Pending';
-      break;
-    case 'issue':
-      generatedIssue = val;
-      const pIss = document.getElementById('preview-dbd');
-      if (pIss) pIss.textContent = val || 'Pending';
-      // Auto-cascade: recalculate expiry when issue date changes
-      if (val && selectedState) {
-        const parsed = parseSimpleDate(val);
-        if (!isNaN(parsed.getTime())) {
-          let exp;
-          if (selectedState.code === 'AZ') {
-            const dobEl = document.getElementById('field-DBB');
-            const dobVal = dobEl?.value?.trim();
-            if (dobVal) {
-              const dob = parseSimpleDate(dobVal);
-              exp = new Date(dob.getFullYear() + 65, dob.getMonth(), dob.getDate());
-            } else {
-              exp = new Date(parsed.getFullYear() + 12, parsed.getMonth(), parsed.getDate());
-            }
-          } else {
-            const expiryYrs = selectedState.expiryYears || 8;
-            exp = new Date(parsed.getFullYear() + expiryYrs, parsed.getMonth(), parsed.getDate());
-          }
-          generatedExpiry = `${padDate(exp.getMonth()+1)}/${padDate(exp.getDate())}/${exp.getFullYear()}`;
-          const expDisplay = document.getElementById('expiry-display');
-          if (expDisplay) expDisplay.value = generatedExpiry;
-          const pExp = document.getElementById('preview-dba');
-          if (pExp) pExp.textContent = generatedExpiry;
-        }
-      }
-      break;
-    case 'expiry':
-      generatedExpiry = val;
-      const pExpy = document.getElementById('preview-dba');
-      if (pExpy) pExpy.textContent = val || 'Pending';
-      break;
+.stat-meter {
+  height: 3px;
+  background: var(--surface-3);
+  border-radius: var(--radius-full);
+  margin-top: var(--space-3);
+  overflow: hidden;
+}
+
+.stat-meter-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width var(--duration-slow) var(--ease-out);
+}
+
+.stat-card[data-accent="blue"] .stat-meter-fill { background: var(--accent-primary); }
+.stat-card[data-accent="cyan"] .stat-meter-fill { background: var(--accent-secondary); }
+.stat-card[data-accent="amber"] .stat-meter-fill { background: var(--accent-warning); }
+.stat-card[data-accent="violet"] .stat-meter-fill { background: var(--accent-info); }
+
+/* ─── 8. Section Headers ───────────────────────────────────────── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.section-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.section-title svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+.section-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── 9. Quick Actions ─────────────────────────────────────────── */
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-8);
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-2);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  transition: transform 160ms var(--ease-out),
+              background 160ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .action-btn:hover {
+    background: var(--surface-2);
+    border-color: var(--border-default);
   }
 }
 
-// ─── Auto-Fill Single Field (blur-mask transition per SKILL.md) ─
-function autoFillField(key) {
-  if (!selectedState) return;
-  const el = document.getElementById(`field-${key}`);
-  if (!el) return;
+.action-btn:active {
+  transform: scale(0.97);
+  background: var(--surface-2);
+}
 
-  const val = autoGenField(key, selectedState.code);
-  if (val) {
-    // Brief blur masks the value change (Emil's blur trick)
-    el.classList.add('auto-filling');
-    setTimeout(() => {
-      el.value = val;
-      el.classList.remove('auto-filling');
-      el.classList.add('auto-filled');
-      setTimeout(() => el.classList.remove('auto-filled'), 800);
-    }, 120);
-    updateFormProgress();
-    if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+.action-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(59,130,246,.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+}
+
+.action-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+.action-label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+}
+
+/* ─── 10. Feature List ─────────────────────────────────────────── */
+.feature-list {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-8);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.feature-item:last-child {
+  border-bottom: none;
+}
+
+.feature-item-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.feature-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(16,185,129,.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-success);
+  flex-shrink: 0;
+}
+
+.feature-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.feature-label {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+}
+
+.feature-check {
+  color: var(--accent-success);
+  display: flex;
+}
+
+.feature-check svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* ─── 11. Mode Selector ────────────────────────────────────────── */
+.mode-selector {
+  display: flex;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.mode-btn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 160ms var(--ease-out),
+              color 160ms var(--ease-out),
+              box-shadow 160ms var(--ease-out);
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mode-btn.active {
+  background: var(--accent-primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.mode-btn:active:not(.active) {
+  background: var(--surface-2);
+}
+
+/* ─── 12. Search ───────────────────────────────────────────────── */
+.search-container {
+  position: relative;
+  margin-bottom: var(--space-4);
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  display: flex;
+  pointer-events: none;
+}
+
+.search-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+.search-input {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4) var(--space-3) 44px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.search-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+
+/* ─── 13. State Grid ───────────────────────────────────────────── */
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.state-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  text-align: center;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  transition: transform 160ms var(--ease-out),
+              border-color 160ms var(--ease-out),
+              background 160ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .state-card:hover {
+    border-color: var(--accent-primary);
+    background: var(--surface-2);
   }
 }
 
-// ─── Form Progress ──────────────────────────────────────────────
-function updateFormProgress() {
-  const fields = document.querySelectorAll('#form-fields [data-field]');
-  const required = [...fields].filter(f => f.hasAttribute('required'));
-  const filled = required.filter(f => f.value.trim() !== '');
-  const pct = required.length ? Math.round(filled.length / required.length * 100) : 0;
-
-  const bar = document.getElementById('progress-fill');
-  const label = document.getElementById('progress-label');
-  if (bar) bar.style.width = pct + '%';
-  if (label) label.textContent = `${filled.length}/${required.length} fields`;
+.state-card:active {
+  transform: scale(0.97);
+  background: var(--surface-2);
 }
 
-// ─── Form Submission ────────────────────────────────────────────
-function submitForm() {
-  if (!selectedState) return;
+/* Stagger animation for state grid items (30-80ms between) */
+.state-card {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: staggerFadeIn 300ms var(--ease-out) forwards;
+}
 
-  const fields = document.querySelectorAll('#form-fields [data-field]');
-  const data = { state: selectedState.code, mode: formMode };
-  let hasError = false;
+.state-card:nth-child(1)  { animation-delay: 0ms; }
+.state-card:nth-child(2)  { animation-delay: 30ms; }
+.state-card:nth-child(3)  { animation-delay: 60ms; }
+.state-card:nth-child(4)  { animation-delay: 90ms; }
+.state-card:nth-child(5)  { animation-delay: 120ms; }
+.state-card:nth-child(6)  { animation-delay: 150ms; }
+.state-card:nth-child(7)  { animation-delay: 180ms; }
+.state-card:nth-child(8)  { animation-delay: 210ms; }
+.state-card:nth-child(9)  { animation-delay: 240ms; }
+.state-card:nth-child(10) { animation-delay: 270ms; }
+.state-card:nth-child(11) { animation-delay: 300ms; }
+.state-card:nth-child(12) { animation-delay: 330ms; }
+.state-card:nth-child(n+13) { animation-delay: 350ms; }
 
-  fields.forEach(el => {
-    const key = el.dataset.field;
-    const val = el.value.trim();
-    if (el.hasAttribute('required') && !val) {
-      el.classList.add('error');
-      hasError = true;
-    } else {
-      el.classList.remove('error');
-    }
-    // Format validation for date fields (MM/DD/YYYY)
-    if (val && (key === 'DBB' || key === 'DBD' || key === 'DBA')) {
-      if (!/^\d{2}\/\d{2}\/\d{4}$/.test(val) && !/^\d{8}$/.test(val)) {
-        el.classList.add('error');
-        hasError = true;
-      }
-    }
-    // Height validation (3 digits like 510, 601, etc.)
-    if (val && key === 'DAU') {
-      if (!/^\d{3}(\s*in)?$/.test(val)) {
-        el.classList.add('error');
-        hasError = true;
-      }
-    }
-    if (val) data[key] = val;
-  });
-
-  // Include ID box values (prefer input value, fallback to generated* variable)
-  const dlnVal = document.getElementById('dln-display')?.value?.trim() || generatedDLN;
-  const icnVal = document.getElementById('icn-display')?.value?.trim() || generatedICN;
-  const ddVal = document.getElementById('dd-display')?.value?.trim() || generatedDD;
-  const issueVal = document.getElementById('issue-display')?.value?.trim() || generatedIssue;
-  const expiryVal = document.getElementById('expiry-display')?.value?.trim() || generatedExpiry;
-  if (dlnVal) data._dln = dlnVal;
-  if (icnVal) data._icn = icnVal;
-  if (ddVal) data._dd = ddVal;
-  if (issueVal) data._issue = issueVal;
-  if (expiryVal) data._expiry = expiryVal;
-
-  if (hasError) {
-    showToast('Please fill all required fields', 'error');
-    if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-    const firstErr = document.querySelector('.form-input.error, .form-select.error');
-    if (firstErr) firstErr.focus();
-    return;
-  }
-
-  if (tg) {
-    try {
-      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-      if (tg.MainButton) {
-        tg.MainButton.showProgress();
-        tg.MainButton.disable();
-      }
-      tg.sendData(JSON.stringify(data));
-      // sendData closes the webapp on success
-    } catch (e) {
-      showToast('Failed to send — use bot /generate instead', 'error');
-      if (tg.MainButton) {
-        tg.MainButton.hideProgress();
-        tg.MainButton.enable();
-      }
-    }
-  } else {
-    console.log('[TMA Mock] Form data:', JSON.stringify(data, null, 2));
-    showToast('Data logged to console (mock mode)', 'success');
+@keyframes staggerFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-// ─── Toast ──────────────────────────────────────────────────────
-function showToast(message, type = 'info') {
-  const toast = document.getElementById('toast');
-  if (!toast) return;
-  toast.textContent = message;
-  toast.className = `toast ${type} show`;
-  setTimeout(() => toast.classList.remove('show'), 3000);
+.state-card:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
-// ─── Event Listeners ────────────────────────────────────────────
-function setupListeners() {
-  const searchInput = document.getElementById('search-states');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => renderStateGrid(e.target.value));
-  }
+.state-code {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--accent-primary);
+  letter-spacing: 0.02em;
+}
 
-  document.addEventListener('input', (e) => {
-    if (e.target.closest('#form-fields')) updateFormProgress();
-  });
+.state-name {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
 
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.mode-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-checked', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-checked', 'true');
-      formMode = btn.dataset.mode;
-      if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
-    });
-  });
+.state-status {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+}
 
-  if (tg) {
-    tg.BackButton.onClick(() => {
-      if (currentView === 'form-view') showView('states-view');
-      else if (currentView === 'states-view') showView('dashboard');
-    });
-    tg.MainButton.onClick(() => submitForm());
+.state-status.active {
+  background: var(--accent-success);
+}
+
+.new-tag::after {
+  content: 'NEW';
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  font-size: 8px;
+  font-weight: var(--weight-bold);
+  color: var(--text-on-accent);
+  background: var(--accent-success);
+  padding: 1px 4px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.06em;
+}
+
+/* ─── 14. Form View ────────────────────────────────────────────── */
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  padding: var(--space-5);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.form-state-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: white;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.form-state-info h2 {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.form-state-info p {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Progress bar */
+.form-progress-bar {
+  height: 4px;
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-2);
+  overflow: hidden;
+}
+
+.form-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: var(--radius-full);
+  transition: width var(--duration-slow) var(--ease-out);
+  min-width: 0;
+}
+
+.form-progress-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-align: right;
+  margin-bottom: var(--space-6);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Form sections */
+.form-section {
+  margin-bottom: var(--space-6);
+}
+
+.form-section-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.form-section-title svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Labels — visible, not placeholder-only (SKILL §8) */
+.form-label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form-label .required {
+  color: var(--accent-error);
+  margin-left: 2px;
+}
+
+/* Inputs */
+.form-input,
+.form-select {
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+  -webkit-appearance: none;
+}
+
+.form-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+
+/* Error state — inline validation (SKILL §8) */
+.form-input.error,
+.form-select.error {
+  border-color: var(--accent-error);
+  box-shadow: 0 0 0 3px rgba(239,68,68,.12);
+}
+
+.form-error-text {
+  font-size: var(--text-xs);
+  color: var(--accent-error);
+  margin-top: var(--space-1);
+}
+
+.form-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.form-select option {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+/* ─── 15. Auto-Generated IDs Card ──────────────────────────────── */
+.auto-ids-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-top: var(--space-6);
+}
+
+.auto-ids-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+}
+
+.auto-ids-header svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--accent-warning);
+  stroke-width: 2;
+  fill: none;
+}
+
+.auto-id-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.auto-id-row:last-child {
+  border-bottom: none;
+}
+
+.auto-id-label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.auto-id-value {
+  font-size: var(--text-sm);
+  color: var(--accent-secondary);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: var(--weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── 16. Generate Button (fallback for non-TG) ────────────────── */
+.generate-btn {
+  width: 100%;
+  min-height: 52px;
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: transform var(--duration-fast) var(--ease-out),
+              opacity var(--duration-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .generate-btn:hover {
+    box-shadow: 0 6px 20px rgba(59,130,246,.35);
+    transform: translateY(-1px);
   }
 }
 
-// ─── Initialize ─────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  initTelegram();
-  renderDashboard();
-  renderStateGrid();
-  setupListeners();
-  showView('dashboard');
-});
+.generate-btn:active {
+  transform: scale(0.97);
+}
+
+.generate-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.generate-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+/* ─── 17. Toast ────────────────────────────────────────────────── */
+/* Toast — enter with ease-out (feels responsive), exit faster (200ms) */
+.toast {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 16px) + 16px);
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  padding: var(--space-3) var(--space-5);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-toast);
+  opacity: 0;
+  /* Exit: fast 200ms ease-out (system responding) */
+  transition: transform 200ms var(--ease-out),
+              opacity 200ms var(--ease-out);
+  white-space: nowrap;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  /* Enter: slightly slower 300ms for spatial awareness */
+  transition: transform 300ms var(--ease-out),
+              opacity 300ms var(--ease-out);
+}
+
+.toast.error {
+  border-color: rgba(239,68,68,.3);
+  color: var(--accent-error);
+}
+
+.toast.success {
+  border-color: rgba(16,185,129,.3);
+  color: var(--accent-success);
+}
+
+/* ─── 18. Empty State ──────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: var(--space-12) var(--space-4);
+}
+
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--text-tertiary);
+  stroke-width: 1.5;
+  fill: none;
+  margin-bottom: var(--space-4);
+}
+
+.empty-state-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state-desc {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+/* ─── 19. Back Button (non-Telegram fallback) ──────────────────── */
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  margin: 0 calc(-1 * var(--space-2));
+  background: none;
+  border: none;
+  color: var(--accent-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.back-btn:active {
+  background: rgba(59,130,246,.1);
+}
+
+.back-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+/* ─── 20. Responsive ───────────────────────────────────────────── */
+@media (min-width: 420px) {
+  .state-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .actions-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 359px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── 21. Reduced Motion ───────────────────────────────────────── */
+/* Reduced motion: fewer and gentler, not zero.
+   Keep opacity/color transitions for comprehension. Remove movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.2s !important;
+  }
+  .state-card,
+  .view {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ─── 22. Focus Visible ────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* ─── 23. Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-3);
+  border-radius: var(--radius-full);
+}
+
+/* ─── 24. Selection ────────────────────────────────────────────── */
+::selection {
+  background: rgba(59,130,246,.3);
+  color: var(--text-primary);
+}
+
+/* ─── 25. ID Display Boxes (DLN / INC) ─────────────────────────── */
+.id-boxes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.id-box {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  position: relative;
+  overflow: hidden;
+}
+
+.id-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+}
+
+.id-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.id-box-label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.id-box-value {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--accent-secondary);
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.id-box-value::placeholder {
+  color: var(--text-tertiary);
+  font-family: 'Inter', sans-serif;
+  font-style: italic;
+  font-weight: var(--weight-normal);
+  letter-spacing: 0;
+}
+
+.id-box-value:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+
+.id-box-value.flash {
+  border-color: var(--accent-success);
+  box-shadow: 0 0 0 3px rgba(16,185,129,.15);
+}
+
+.id-box-format {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-top: var(--space-2);
+  font-style: italic;
+}
+
+/* ─── 26. Auto-Generate Buttons ────────────────────────────────── */
+.auto-gen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: rgba(59,130,246,.12);
+  border: 1px solid rgba(59,130,246,.2);
+  border-radius: var(--radius-sm);
+  color: var(--accent-primary);
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  font-family: inherit;
+  cursor: pointer;
+  min-height: 28px;
+  /* Specify exact properties — never use 'all' */
+  transition: transform 160ms var(--ease-out),
+              background 160ms var(--ease-out),
+              border-color 160ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.auto-gen-btn:active {
+  transform: scale(0.97);
+  background: rgba(59,130,246,.2);
+}
+
+.auto-gen-btn svg {
+  color: var(--accent-warning);
+}
+
+/* ─── 27. Form Label Row (label + mini auto-gen) ───────────────── */
+.form-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-1);
+}
+
+.auto-gen-mini {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245,158,11,.1);
+  border: 1px solid rgba(245,158,11,.2);
+  border-radius: var(--radius-sm);
+  color: var(--accent-warning);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 160ms var(--ease-out),
+              background 160ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.auto-gen-mini:active {
+  transform: scale(0.93);
+  background: rgba(245,158,11,.2);
+}
+
+/* ─── 28. Auto-Fill Animation (transition-based, interruptible) ── */
+.form-input.auto-filled,
+.form-select.auto-filled {
+  border-color: var(--accent-success);
+  box-shadow: 0 0 0 3px rgba(16,185,129,.15);
+  transition: border-color 300ms var(--ease-out),
+              box-shadow 300ms var(--ease-out),
+              filter 200ms ease;
+  filter: blur(0px);
+}
+
+/* Brief blur during crossfade masks the value change — Emil's blur trick */
+.form-input.auto-filling,
+.form-select.auto-filling {
+  filter: blur(1.5px);
+  opacity: 0.7;
+  transition: filter 120ms ease, opacity 120ms ease;
+}
+
+/* ─── 29. Responsive Overrides for ID Boxes ────────────────────── */
+.id-box-full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 359px) {
+  .id-boxes-grid {
+    grid-template-columns: 1fr;
+  }
+  .id-box-full {
+    grid-column: auto;
+  }
+}
+
+/* ─── 30. In-Form Submit Button ────────────────────────────────── */
+.form-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-4) var(--space-6);
+  margin-top: var(--space-6);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              opacity var(--duration-fast) var(--ease-out);
+  box-shadow: 0 4px 15px rgba(59,130,246,.3);
+  letter-spacing: 0.02em;
+}
+
+/* Gate hover behind media query — touch devices trigger false positives */
+@media (hover: hover) and (pointer: fine) {
+  .form-submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(59,130,246,.4);
+  }
+}
+
+.form-submit-btn:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.form-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
