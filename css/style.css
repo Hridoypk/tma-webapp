@@ -1412,3 +1412,15 @@ body {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* ─── v20.1: search empty-state ────────────────────────────────── */
+.state-empty {
+  grid-column: 1 / -1;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  border: 1px dashed var(--border-default);
+  border-radius: 12px;
+  background: var(--surface-1);
+}
