@@ -395,7 +395,7 @@ function renderDashboard() {
 
   // Update version display
   const verEl = document.getElementById('app-version');
-  if (verEl) verEl.textContent = 'v18.1';
+  if (verEl) verEl.textContent = 'v20.1';
 }
 
 // ─── State Grid ─────────────────────────────────────────────────
@@ -408,15 +408,20 @@ function renderStateGrid(filter = '') {
     s.code.toLowerCase().includes(filter.toLowerCase())
   );
 
-  grid.innerHTML = filtered.map(s => `
-    <div class="state-card ${s.tag ? 'new-tag' : ''}" data-code="${s.code}"
-         onclick="selectState('${s.code}')" role="button" tabindex="0"
-         aria-label="${s.name}">
-      <span class="state-code">${s.code}</span>
-      <span class="state-name">${s.name}</span>
-      <span class="state-status active"></span>
-    </div>
-  `).join('');
+  // UX: show a clear empty state instead of a blank grid when nothing matches.
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="state-empty" role="status">No states match \u201c${filter}\u201d. Try a different name or code.</div>`;
+  } else {
+    grid.innerHTML = filtered.map(s => `
+      <div class="state-card ${s.tag ? 'new-tag' : ''}" data-code="${s.code}"
+           onclick="selectState('${s.code}')" role="button" tabindex="0"
+           aria-label="${s.name}">
+        <span class="state-code">${s.code}</span>
+        <span class="state-name">${s.name}</span>
+        <span class="state-status active"></span>
+      </div>
+    `).join('');
+  }
 
   const countEl = document.getElementById('state-count');
   if (countEl) countEl.textContent = filtered.length;
@@ -1030,6 +1035,15 @@ function setupListeners() {
   const searchInput = document.getElementById('search-states');
   if (searchInput) {
     searchInput.addEventListener('input', (e) => renderStateGrid(e.target.value));
+    // UX: press Enter to jump straight into the first matching state.
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      const q = e.target.value.toLowerCase();
+      const match = STATES.find(s =>
+        s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q)
+      );
+      if (match) selectState(match.code);
+    });
   }
 
   document.addEventListener('input', (e) => {
